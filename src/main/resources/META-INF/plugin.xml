@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="true">
     <!-- 插件的id，id全局唯一 -->
     <id>com.plugin.sql</id>
 
@@ -7,7 +7,7 @@
     <version>3.2.1</version>
 
     <!-- 作者信息 -->
-    <vendor email="258523454@qq.com" url="https://zhangxiaofan.blog.csdn.net/">zhangxiaofan</vendor>
+    <vendor email="258523454@qq.com" url="https://zhangxiaofan.blog.csdn.net/">Zhang Xiaofan</vendor>
 
     <!-- 插件描述,要大于40个字符-->
     <description>
@@ -62,7 +62,7 @@
     </change-notes>
 
     <!-- 兼容的idea版本 -->
-    <idea-version since-build="191.0"/>
+    <idea-version since-build="193"/>
 
     <!-- 依赖模块 -->
     <depends>com.intellij.modules.platform</depends>
