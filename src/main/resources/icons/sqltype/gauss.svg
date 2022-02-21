@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 gauss.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="0.17068in" height="0.17068in"
+		viewBox="0 0 12.289 12.289" xml:space="preserve" color-interpolation-filters="sRGB" class="st4">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#ffff00;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.1}
+		.st2 {fill:#ff3300;font-family:Times New Roman;font-size:0.833336em}
+		.st3 {stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.1}
+		.st4 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<g id="shape4-1" v:mID="4" v:groupContext="shape" transform="translate(0.05,-0.05)">
+			<title>工作表.4</title>
+			<desc>G</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="6.09449" cy="6.19449" width="12.19" height="12.189"/>
+			<rect x="0" y="0.1" width="12.189" height="12.189" class="st1"/>
+			<text x="4" y="9.19" class="st2" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>G</text>		</g>
+		<g id="shape5-4" v:mID="5" v:groupContext="shape" transform="translate(-8.63962,3.54936) rotate(-45)">
+			<title>工作表.5</title>
+			<path d="M0 12.29 L5.82 12.29" class="st3"/>
+		</g>
+		<g id="shape8-7" v:mID="8" v:groupContext="shape" transform="translate(8.73962,-8.63962) rotate(45)">
+			<title>工作表.8</title>
+			<path d="M0 12.29 L5.8 12.29" class="st3"/>
+		</g>
+	</g>
+</svg>

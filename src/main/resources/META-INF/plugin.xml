@@ -1,0 +1,120 @@
+<idea-plugin>
+    <!-- 插件的id，id全局唯一 -->
+    <id>com.plugin.sql</id>
+
+    <!-- 插件的名称和版本, 会在idea插件界面显示 -->
+    <name>Java Mybatis SQL Scanner</name>
+    <version>3.2.1</version>
+
+    <!-- 作者信息 -->
+    <vendor email="258523454@qq.com" url="https://zhangxiaofan.blog.csdn.net/">zhangxiaofan</vendor>
+
+    <!-- 插件描述,要大于40个字符-->
+    <description>
+        note 1:Executor panel can change the database type(Mysql is default);
+        note 2:Idea settings(Other Settings) can turn rules on or off;
+    </description>
+
+    <description><![CDATA[
+    <!--
+    <div>
+        <img width="500" height="500" src="https://raw.githubusercontent.com/starcwang/easy_javadoc/master/doc/k03vffH6Hg.gif" /><br>
+    </div>
+    -->
+    <b>English:</b><br/>
+    This plugin can help us to scan mybatis sql xml.<br/>
+    Select a mapper's directory, then right-click, choose button to execute.Or click tools menu,and choose button to execute after you change database. <br/>
+    Support for Mysql,Oracle,DB2,Gauss,etc... <br/>
+    Note:<br/>
+    <ul>
+        <li>Executor panel can change the database type(Mysql is default).</li>
+        <li>Idea settings(Other Settings) can turn rules on or off.</li>
+    </ul>
+    <br/>
+    <b>中文:</b><br/>
+    Mybatis XML扫描插件<br/>
+    在idea中右键一个含有 Mybatis Sql Xml的目录,然后选择"Java Mybatis SQL Scanner"执行。或者通过Tools菜单打开执行界面,可以更改默认的数据库类型,再点击执行按钮。<br/>
+    支持：Mysql,Oracle,DB2,Gauss等等。<br/>
+    注意:<br/>
+    <ul>
+        <li>执行面板可以更改数据库类型(默认是:Mysql)；</li>
+        <li>Idea中Other Settings设置里面可以调整扫描规则和等级；</li>
+    </ul>
+    ]]></description>
+
+    <!-- 插件版本更新记录 -->
+    <change-notes>
+        <![CDATA[
+        <p><b>English</b></p>
+        <ul>
+            <li><b>Version 3.2.1</b> Settings can turn rules on or off. </li>
+            <li><b>Version 2.1.0</b> Support mysql,oracle,gauss,postgresql,db2</li>
+            <li><b>Version 1.0.0</b> Java Mybatis SQL Scanner</li>
+        </ul>
+        <br/>
+        <p><b>中文</b></p>
+        <ul>
+            <li><b>Version 3.2.1</b> 新增规则开关和调整规则等级</li>
+            <li><b>Version 2.1.0</b> 支持数据库 mysql,oracle,gauss,postgresql,db2</li>
+            <li><b>Version 1.0.0</b> Mybatis XML 扫描</li>
+         </ul>
+    ]]>
+    </change-notes>
+
+    <!-- 兼容的idea版本 -->
+    <idea-version since-build="191.0"/>
+
+    <!-- 依赖模块 -->
+    <depends>com.intellij.modules.platform</depends>
+    <!-- 同时需要引入,否则2020版本找不到 com.intellij.psi -->
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- 自定义 底部view -->
+        <executor id="zhang.TreeConsoleExecutor" order="last"
+                  implementation="com.zhang.scanner.executor.TreeConsoleExecutor"/>
+
+        <!--参考官方demo:https://plugins.jetbrains.com/docs/intellij/settings-tutorial.html -->
+        <applicationConfigurable parentId="configurable.group.other"
+                                 instance="com.zhang.scanner.settings.MySettingsConfig"
+                                 id="MySettingsPersistent"
+                                 displayName="Java Mybatis SQL Scanner Rules"/>
+
+        <applicationService serviceImplementation="com.zhang.scanner.settings.MySettingsPersistent"/>
+
+    </extensions>
+
+    <actions>
+
+        <action id="zhang.bottom_tool.id" class="com.zhang.scanner.action.ShowRunAction"
+                text="Java Mybatis SQL Scanner" description="Description"
+                icon="/icons/scanner.svg">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
+
+        <!-- 树形节点右键弹框选择 -->
+        <group id="zhang.group.treePop">
+            <action id="zhang.group.action.copy" class="com.zhang.scanner.action.CopyTreeSelectedAction"
+                    text="Copy" icon="AllIcons.Actions.Selectall" description="Description"/>
+
+            <action id="zhang.group.action.delete" class="com.zhang.scanner.action.DeleteTreeSelectedAction"
+                    text="Delete" icon="AllIcons.Actions.Cancel" description="Description"/>
+        </group>
+
+        <!-- split 面板, 底部左窗口, 代码预览 -->
+        <action id="zhang.action.CodePreviewAction" class="com.zhang.scanner.action.preview.CodePreviewAction"
+                text="CodePreviewAction"/>
+
+        <!-- split 面板, 底部右窗口, 错误信息展示 -->
+        <action id="zhang.action.ErrorMsgPreviewAction" class="com.zhang.scanner.action.preview.RuleResultViewAction"
+                text="ErrorMsgPreviewAction"/>
+
+        <!-- 右键弹窗扫描 -->
+        <action id="zhang.action.basic.PopupDialogAction" text="Java Mybatis SQL Scanner"
+                class="com.zhang.scanner.action.RunAction"
+                description="Description" icon="/icons/scanner.svg">
+            <add-to-group anchor="before" group-id="ProjectViewPopupMenu" relative-to-action="FindUsages"/>
+        </action>
+    </actions>
+</idea-plugin>
