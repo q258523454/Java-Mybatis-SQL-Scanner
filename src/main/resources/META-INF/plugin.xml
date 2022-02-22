@@ -9,36 +9,25 @@
     <!-- 作者信息 -->
     <vendor email="258523454@qq.com" url="https://zhangxiaofan.blog.csdn.net/">Zhang Xiaofan</vendor>
 
-    <!-- 插件描述,要大于40个字符-->
-    <description>
-        note 1:Executor panel can change the database type(Mysql is default);
-        note 2:Idea settings(Other Settings) can turn rules on or off;
-    </description>
-
     <description><![CDATA[
-    <!--
-    <div>
-        <img width="500" height="500" src="https://raw.githubusercontent.com/starcwang/easy_javadoc/master/doc/k03vffH6Hg.gif" /><br>
-    </div>
-    -->
+    The plugin can help us to scan mybatis sql xml,which support <b>Mysql</b>, <b>Oracle</b>, <b>Gauss</b>, <b>DB2</b> databases.<br/>
     <b>English:</b><br/>
-    This plugin can help us to scan mybatis sql xml.<br/>
     Select a mapper's directory, then right-click, choose button to execute.Or click tools menu,and choose button to execute after you change database. <br/>
     Support for Mysql,Oracle,DB2,Gauss,etc... <br/>
     Note:<br/>
     <ul>
-        <li>Executor panel can change the database type(Mysql is default).</li>
-        <li>Idea settings(Other Settings) can turn rules on or off.</li>
+        <li>Executor panel can change the database type(default is mysql).</li>
+        <li>idea settings(other Settings) can turn rules on or off.</li>
     </ul>
     <br/>
     <b>中文:</b><br/>
-    Mybatis XML扫描插件<br/>
-    在idea中右键一个含有 Mybatis Sql Xml的目录,然后选择"Java Mybatis SQL Scanner"执行。或者通过Tools菜单打开执行界面,可以更改默认的数据库类型,再点击执行按钮。<br/>
+    这款插件能帮助我们扫描 Mybatis SQL XML 文件,分析出不规范或者潜在风险的SQL。<br/>
+    在idea中右键一个含有 Mybatis Sql Xml的目录，然后选择"Java Mybatis SQL Scanner"执行。或者通过Tools菜单打开执行界面，可以更改默认的数据库类型，再点击执行按钮。<br/>
     支持：Mysql,Oracle,DB2,Gauss等等。<br/>
-    注意:<br/>
+    注意：<br/>
     <ul>
-        <li>执行面板可以更改数据库类型(默认是:Mysql)；</li>
-        <li>Idea中Other Settings设置里面可以调整扫描规则和等级；</li>
+        <li>执行面板可以更改数据库类型(默认是:Mysql)。</li>
+        <li>idea中Other Settings设置里面可以调整扫描规则和等级。</li>
     </ul>
     ]]></description>
 
@@ -47,7 +36,7 @@
         <![CDATA[
         <p><b>English</b></p>
         <ul>
-            <li><b>Version 3.2.1</b> Settings can turn rules on or off. </li>
+            <li><b>Version 3.2.1</b> Settings can turn rules on or off</li>
             <li><b>Version 2.1.0</b> Support mysql,oracle,gauss,postgresql,db2</li>
             <li><b>Version 1.0.0</b> Java Mybatis SQL Scanner</li>
         </ul>
