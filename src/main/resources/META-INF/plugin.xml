@@ -18,6 +18,7 @@
     <ul>
         <li>Executor panel can change the database type(default is mysql).</li>
         <li>idea settings(other Settings) can turn rules on or off.</li>
+        <li>Support quick preview, jump and some SQL repair suggestions.</li>
     </ul>
     <br/>
     <b>中文:</b><br/>
@@ -28,6 +29,7 @@
     <ul>
         <li>执行面板可以更改数据库类型(默认是:Mysql)。</li>
         <li>idea中Other Settings设置里面可以调整扫描规则和等级。</li>
+        <li>支持快速预览，快速跳转以及部分SQL修复建议。</li>
     </ul>
     ]]></description>
 
