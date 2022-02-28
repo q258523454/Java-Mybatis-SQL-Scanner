@@ -2,6 +2,7 @@
 
 ### Java Mybatis SQL Scanner
 This plugin can help us to scan mybatis sql xml:  
+JetBrains Marketplace:[Java Mybatis SQL Scanner](https://plugins.jetbrains.com/plugin/18661-java-mybatis-sql-scanner/)
 ![](src/main/resources/img/guide.gif)
 
 turn rules on or off.  
