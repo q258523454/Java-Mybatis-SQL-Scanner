@@ -5,8 +5,11 @@ This plugin can help us to scan mybatis sql xml:
 JetBrains Marketplace:[Java Mybatis SQL Scanner](https://plugins.jetbrains.com/plugin/18661-java-mybatis-sql-scanner/)
 ![](src/main/resources/img/guide.gif)
 
+Change the database type.
+![](src/main/resources/img/changedatabase.jpeg)  
+
 turn rules on or off.  
-![](src/main/resources/img/turn.png)  
+![](src/main/resources/img/turn.png)    
 
 这里开源的是idea插件界面，扫描方法在 <b>com.cmb.zmain</b> 下面，这个因为版权原因，无法开源，大家只能参考！
 
