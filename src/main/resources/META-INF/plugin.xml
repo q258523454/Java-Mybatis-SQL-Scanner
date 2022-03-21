@@ -4,10 +4,10 @@
 
     <!-- 插件的名称和版本, 会在idea插件界面显示 -->
     <name>Java Mybatis SQL Scanner</name>
-    <version>3.2.1</version>
+    <version>3.2.2</version>
 
     <!-- 作者信息 -->
-    <vendor email="258523454@qq.com" url="https://zhangxiaofan.blog.csdn.net/">Zhang Xiaofan</vendor>
+    <vendor email="258523454@qq.com" url="https://zhangxiaofan.blog.csdn.net/">Zhang Jian</vendor>
 
     <description><![CDATA[
     The plugin can help us to scan mybatis sql xml,which support <b>Mysql</b>, <b>Oracle</b>, <b>Gauss</b>, <b>DB2</b> databases.<br/>
@@ -38,6 +38,7 @@
         <![CDATA[
         <p><b>English</b></p>
         <ul>
+            <li><b>Version 3.2.2</b> Ignore the specified directory which contains '.idea' and 'target'</li>
             <li><b>Version 3.2.1</b> Settings can turn rules on or off</li>
             <li><b>Version 2.1.0</b> Support mysql,oracle,gauss,postgresql,db2</li>
             <li><b>Version 1.0.0</b> Java Mybatis SQL Scanner</li>
@@ -45,6 +46,7 @@
         <br/>
         <p><b>中文</b></p>
         <ul>
+            <li><b>Version 3.2.2</b> 忽略包含'.idea'和'target'名字的目录</li>
             <li><b>Version 3.2.1</b> 新增规则开关和调整规则等级</li>
             <li><b>Version 2.1.0</b> 支持数据库 mysql,oracle,gauss,postgresql,db2</li>
             <li><b>Version 1.0.0</b> Mybatis XML 扫描</li>
