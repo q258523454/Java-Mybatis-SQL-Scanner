@@ -5,15 +5,21 @@ plugins {
 }
 
 group 'com.zhang'
-version '3.2.2'
+version '3.2.3'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'org.projectlombok:lombok:1.18.8'
+    implementation 'com.alibaba:druid:1.2.8'
+    implementation 'org.apache.directory.studio:org.dom4j.dom4j:1.6.1'
+    implementation 'commons-lang:commons-lang:2.5'
+    implementation 'commons-codec:commons-codec:1.10'
+    implementation 'com.alibaba:fastjson:1.2.68'
+    implementation 'org.projectlombok:lombok:1.18.8'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+    implementation 'org.slf4j:slf4j-log4j12:2.0.0-alpha1'
     // 加载本地依赖
     compile fileTree(dir:'src/main/resources/libs',includes:['*.jar'])
     // 系统
@@ -43,6 +49,21 @@ test {
     useJUnitPlatform()
 }
 
+sourceSets {
+    main {
+        java {
+            // 忽略所有的 src/main/java/test目录
+            exclude 'test/**'
+        }
+        resources {
+            // 打包忽略目录和文件
+            exclude 'img/**'
+            exclude 'libsource/**'
+            exclude 'icons/mybatis/**'
+            exclude 'icons/scanner.vsdx'
+        }
+    }
+}
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
