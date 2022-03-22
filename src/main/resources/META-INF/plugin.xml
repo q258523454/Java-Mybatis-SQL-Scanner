@@ -4,12 +4,14 @@
 
     <!-- 插件的名称和版本, 会在idea插件界面显示 -->
     <name>Java Mybatis SQL Scanner</name>
-    <version>3.2.3</version>
+    <version>3.2.4</version>
 
     <!-- 作者信息 -->
     <vendor email="258523454@qq.com" url="https://zhangxiaofan.blog.csdn.net/">Zhang Jian</vendor>
 
     <description><![CDATA[
+    <a href="https://github.com/q258523454/Java-Mybatis-SQL-Scanner">GitHub</a> | <a href="https://blog.csdn.net/q258523454/article/details/123094358?spm=1001.2014.3001.5501">CSDN</a>
+    <br/>
     The plugin can help us to scan mybatis sql xml,which support <b>Mysql</b>, <b>Oracle</b>, <b>Gauss</b>, <b>DB2</b> databases.<br/>
     <b>English:</b><br/>
     Select a mapper's directory, then right-click, choose button to execute.Or click tools menu,and choose button to execute after you change database. <br/>
