@@ -2,7 +2,7 @@
 
 package com.zhang.scanner.settings;
 
-import com.cmb.zmain.enums.RuleCodeEnum;
+import com.zhang.zmain.enums.RuleCodeEnum;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.util.ui.ListTableModel;
 import com.intellij.util.ui.table.TableModelEditor;

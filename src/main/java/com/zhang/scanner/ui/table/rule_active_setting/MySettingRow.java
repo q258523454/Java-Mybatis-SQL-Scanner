@@ -1,7 +1,7 @@
 package com.zhang.scanner.ui.table.rule_active_setting;
 
-import com.cmb.zmain.enums.DegreeEnum;
-import com.cmb.zmain.enums.RuleCodeEnum;
+import com.zhang.zmain.enums.DegreeEnum;
+import com.zhang.zmain.enums.RuleCodeEnum;
 import com.zhang.scanner.utils.MyRuleUtil;
 
 import java.io.Serializable;

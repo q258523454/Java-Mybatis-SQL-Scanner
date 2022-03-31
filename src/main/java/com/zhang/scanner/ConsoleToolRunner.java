@@ -1,11 +1,11 @@
 package com.zhang.scanner;
 
-import com.cmb.zmain.enums.DegreeEnum;
-import com.cmb.zmain.enums.RuleCodeEnum;
-import com.cmb.zmain.pojo.BaseResult;
-import com.cmb.zmain.pojo.ideaPlugin.XmlPluginRuleResult;
-import com.cmb.zmain.pojo.ideaPlugin.XmlPluginRuleResultAll;
-import com.cmb.zmain.util.ResultUtil;
+import com.zhang.zmain.enums.DegreeEnum;
+import com.zhang.zmain.enums.RuleCodeEnum;
+import com.zhang.zmain.pojo.BaseResult;
+import com.zhang.zmain.pojo.ideaPlugin.XmlPluginRuleResult;
+import com.zhang.zmain.pojo.ideaPlugin.XmlPluginRuleResultAll;
+import com.zhang.zmain.util.ResultUtil;
 import com.intellij.execution.DefaultExecutionResult;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionManager;

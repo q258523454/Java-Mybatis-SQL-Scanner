@@ -1,7 +1,7 @@
 package com.zhang.scanner.pojo;
 
 
-import com.cmb.zmain.pojo.ideaPlugin.XmlPluginRuleResult;
+import com.zhang.zmain.pojo.ideaPlugin.XmlPluginRuleResult;
 
 public class MapperFileInfo {
 

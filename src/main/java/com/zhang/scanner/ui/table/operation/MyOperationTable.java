@@ -1,7 +1,7 @@
 package com.zhang.scanner.ui.table.operation;
 
-import com.cmb.zmain.pojo.BaseResult;
-import com.cmb.zmain.util.ResultUtil;
+import com.zhang.zmain.pojo.BaseResult;
+import com.zhang.zmain.util.ResultUtil;
 import com.intellij.util.Function;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ListTableModel;

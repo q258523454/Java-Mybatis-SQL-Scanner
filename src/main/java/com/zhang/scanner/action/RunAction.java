@@ -1,8 +1,6 @@
 
 package com.zhang.scanner.action;
 
-import com.cmb.zmain.parser.XmlBatisSqlParser;
-import com.cmb.zmain.pojo.BaseResult;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -12,6 +10,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.zhang.scanner.ConsoleToolRunner;
 import com.zhang.scanner.executor.TreeConsoleExecutor;
 import com.zhang.scanner.utils.MyExecutorUtil;
+import com.zhang.zmain.parser.XmlBatisSqlParser;
+import com.zhang.zmain.pojo.BaseResult;
 import org.apache.log4j.BasicConfigurator;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,7 +1,7 @@
 package com.zhang.scanner.pojo.tree;
 
-import com.cmb.zmain.enums.DegreeEnum;
-import com.cmb.zmain.enums.RuleCodeEnum;
+import com.zhang.zmain.enums.DegreeEnum;
+import com.zhang.zmain.enums.RuleCodeEnum;
 import com.intellij.ui.treeStructure.SimpleNode;
 import com.zhang.scanner.utils.MyIconUtil;
 

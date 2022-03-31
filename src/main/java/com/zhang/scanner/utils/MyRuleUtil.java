@@ -1,6 +1,6 @@
 package com.zhang.scanner.utils;
 
-import com.cmb.zmain.enums.DegreeEnum;
+import com.zhang.zmain.enums.DegreeEnum;
 import com.zhang.scanner.ui.table.rule_active_setting.MyRuleIcon;
 
 public enum MyRuleUtil {

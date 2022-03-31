@@ -29,6 +29,5 @@
 gradle
 
 /src/main/resources/libsource
-/src/main/resources/libs
 /src/main/resources/icons/scanner.vsdx
 src/main/java/test
