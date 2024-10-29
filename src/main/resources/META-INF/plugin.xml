@@ -10,24 +10,24 @@
     <vendor email="258523454@qq.com" url="https://zhangxiaofan.blog.csdn.net/">Zhang Jian</vendor>
 
     <description><![CDATA[
-    <a href="https://github.com/q258523454/Java-Mybatis-SQL-Scanner">GitHub</a> | <a href="https://blog.csdn.net/q258523454/article/details/123094358?spm=1001.2014.3001.5501">CSDN</a>
+    <a href=" ">GitHub</a > | <a href="https://blog.csdn.net/q258523454/article/details/123094358?spm=1001.2014.3001.5501">CSDN</a >
     <br/>
     The plugin can help us to scan mybatis sql xml,which support <b>Mysql</b>, <b>Oracle</b>, <b>Gauss</b>, <b>DB2</b> databases.<br/>
     <b>English:</b><br/>
-    Select a mapper's directory, then right-click, choose button to execute.Or click tools menu,and choose button to execute after you change database. <br/>
-    Support for Mysql,Oracle,DB2,Gauss,etc... <br/>
-    Note:<br/>
+    Please select the directory of a mapper, then right-click and choose the 'execute' option. Alternatively, click on the 'tools' menu and select the 'execute' option after changing the database. <br/>
+    This feature supports MySQL, Oracle, DB2, Gauss, and other databases. <br/>
+    Note:
     <ul>
-        <li>Executor panel can change the database type(default is mysql).</li>
-        <li>idea settings(other Settings) can turn rules on or off.</li>
-        <li>Support quick preview, jump and some SQL repair suggestions.</li>
+        <li>The Executor panel allows you to switch the database type, with the default setting being MySQL.</li>
+        <li>Within the IDEA settings (under 'Other Settings'), you can enable or disable specific rules.</li>
+        <li>The tool supports quick preview, navigation, and offers several SQL repair suggestions..</li>
     </ul>
     <br/>
     <b>中文:</b><br/>
     这款插件能帮助我们扫描 Mybatis SQL XML 文件,分析出不规范或者潜在风险的SQL。<br/>
     在idea中右键一个含有 Mybatis Sql Xml的目录，然后选择"Java Mybatis SQL Scanner"执行。或者通过Tools菜单打开执行界面，可以更改默认的数据库类型，再点击执行按钮。<br/>
     支持：Mysql,Oracle,DB2,Gauss等等。<br/>
-    注意：<br/>
+    注意：
     <ul>
         <li>执行面板可以更改数据库类型(默认是:Mysql)。</li>
         <li>idea中Other Settings设置里面可以调整扫描规则和等级。</li>
@@ -36,23 +36,28 @@
     ]]></description>
 
     <!-- 插件版本更新记录 -->
+    <!-- 插件版本更新记录 -->
     <change-notes>
         <![CDATA[
-        <p><b>English</b></p>
+        <p><b>English</b></p >
         <ul>
-            <li><b>Version 3.2.2</b> Ignore the specified directory which contains '.idea' and 'target'</li>
-            <li><b>Version 3.2.1</b> Settings can turn rules on or off</li>
-            <li><b>Version 2.1.0</b> Support mysql,oracle,gauss,postgresql,db2</li>
+            <li><b>Version 4.0.0</b> Optimize the SQL scanning algorithm and internationalize the text display..</li>
+            <li><b>Version 3.2.5</b> Resolved several issues related to plugin display</li>
+            <li><b>Version 3.2.2</b> Now ignores directories specified by containing '.idea' and 'target'</li>
+            <li><b>Version 3.2.1</b> Introduced settings to enable or disable individual rules</li>
+            <li><b>Version 2.1.0</b> Added support for MySQL, Oracle, Gauss, PostgreSQL, and DB2 databases</li>
             <li><b>Version 1.0.0</b> Java Mybatis SQL Scanner</li>
         </ul>
         <br/>
-        <p><b>中文</b></p>
+        <p><b>中文</b></p >
         <ul>
+            <li><b>Version 4.0.0</b> 优化SQL扫描算法,以及完全国际化</li>
+            <li><b>Version 3.2.5</b> 修复部分插件显示问题</li>
             <li><b>Version 3.2.2</b> 忽略包含'.idea'和'target'名字的目录</li>
             <li><b>Version 3.2.1</b> 新增规则开关和调整规则等级</li>
-            <li><b>Version 2.1.0</b> 支持数据库 mysql,oracle,gauss,postgresql,db2</li>
+            <li><b>Version 2.1.0</b> 支持数据库 MySQL,Oracle,Gauss,PostgreSQL,DB2等</li>
             <li><b>Version 1.0.0</b> Mybatis XML 扫描</li>
-         </ul>
+        </ul>
     ]]>
     </change-notes>
 
