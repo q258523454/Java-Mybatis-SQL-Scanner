@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.zhang'
-version '4.0.0'
+version '4.0.1'
 
 repositories {
     mavenCentral()
@@ -58,6 +58,7 @@ sourceSets {
         resources {
             // 打包忽略目录和文件
             exclude 'img/**'
+            exclude 'libs/**'
             exclude 'libsource/**'
             exclude 'icons/mybatis/**'
             exclude 'icons/scanner.vsdx'
