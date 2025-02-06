@@ -12,7 +12,6 @@ import com.zhang.scanner.executor.TreeConsoleExecutor;
 import com.zhang.scanner.utils.MyExecutorUtil;
 import com.zhang.zmain.parser.XmlBatisSqlParser;
 import com.zhang.zmain.pojo.BaseResult;
-import org.apache.log4j.BasicConfigurator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -40,8 +39,6 @@ public class RunAction extends AnAction {
         // 默认 oracle
         String dbType = executor.getDbType();
 
-        // 加载slf4j等基本资源
-        BasicConfigurator.configure();
         // 构造xml解析器
         XmlBatisSqlParser xmlBatisSqlParser = new XmlBatisSqlParser();
         List<BaseResult> result = new ArrayList<>();
@@ -77,7 +74,5 @@ public class RunAction extends AnAction {
         } else {
             Messages.showMessageDialog(project, "未选择目录!请右键待扫描目录.", "提示", Messages.getInformationIcon());
         }
-
     }
-
 }

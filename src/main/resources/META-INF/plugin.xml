@@ -41,7 +41,7 @@
         <![CDATA[
         <p><b>English</b></p >
         <ul>
-            <li><b>Version 4.0.1</b> Add DDL rules.</li>
+            <li><b>Version 4.0.1</b> Add DDL rules and remove log4j.</li>
             <li><b>Version 4.0.0</b> Optimize the SQL scanning algorithm and internationalize the text display..</li>
             <li><b>Version 3.2.5</b> Resolved several issues related to plugin display</li>
             <li><b>Version 3.2.2</b> Now ignores directories specified by containing '.idea' and 'target'</li>
@@ -52,7 +52,7 @@
         <br/>
         <p><b>中文</b></p >
         <ul>
-            <li><b>Version 4.0.1</b> 新增DDL规则</li>
+            <li><b>Version 4.0.1</b> 新增DDL规则,去掉log4j</li>
             <li><b>Version 4.0.0</b> 优化SQL扫描算法,以及完全国际化</li>
             <li><b>Version 3.2.5</b> 修复部分插件显示问题</li>
             <li><b>Version 3.2.2</b> 忽略包含'.idea'和'target'名字的目录</li>
