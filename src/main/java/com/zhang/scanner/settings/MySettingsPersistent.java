@@ -29,7 +29,7 @@ public class MySettingsPersistent implements PersistentStateComponent<MySettings
     public List<MySettingRow> ruleSelectedList;
 
     public static MySettingsPersistent getInstance() {
-        return ApplicationManager.getApplication().getComponent(MySettingsPersistent.class);
+        return ApplicationManager.getApplication().getService(MySettingsPersistent.class);
     }
 
     @Nullable
