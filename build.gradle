@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.zhang'
-version '4.0.1'
+version '4.0.2'
 
 repositories {
     mavenCentral()
@@ -14,10 +14,6 @@ repositories {
 dependencies {
     implementation 'com.alibaba:druid:1.2.8'
     implementation 'org.apache.directory.studio:org.dom4j.dom4j:1.6.1'
-    implementation 'commons-lang:commons-lang:2.5'
-    implementation 'commons-codec:commons-codec:1.10'
-    implementation 'com.alibaba:fastjson:1.2.68'
-    implementation 'org.projectlombok:lombok:1.18.8'
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation 'org.slf4j:slf4j-jdk14:2.0.0-alpha1'
     // 加载本地依赖

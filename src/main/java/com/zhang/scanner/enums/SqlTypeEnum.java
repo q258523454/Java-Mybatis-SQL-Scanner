@@ -1,6 +1,6 @@
 package com.zhang.scanner.enums;
 
-import org.apache.commons.lang3.StringUtils;
+import com.intellij.openapi.util.text.StringUtil;
 
 public enum SqlTypeEnum {
     /**
@@ -27,7 +27,7 @@ public enum SqlTypeEnum {
 
     public static SqlTypeEnum parse(String code) {
         for (SqlTypeEnum item : values()) {
-            if (StringUtils.equals(code, item.code)) {
+            if (StringUtil.equals(code, item.code)) {
                 return item;
             }
         }
