@@ -4,7 +4,7 @@
 
     <!-- 插件的名称和版本, 会在idea插件界面显示 -->
     <name>Java Mybatis SQL Scanner</name>
-    <version>4.0.2</version>
+    <version>5.0.0</version>
 
     <!-- 作者信息 -->
     <vendor email="258523454@qq.com" url="https://zhangxiaofan.blog.csdn.net/">Zhang Jian</vendor>
@@ -41,6 +41,7 @@
         <![CDATA[
         <p><b>English</b></p >
         <ul>
+            <li><b>Version 5.0.0</b> Fixed compatibility issues.</li>
             <li><b>Version 4.0.2</b> Delete redundant dependencies.</li>
             <li><b>Version 4.0.1</b> Add DDL rules and remove log4j.</li>
             <li><b>Version 4.0.0</b> Optimize the SQL scanning algorithm and internationalize the text display..</li>
@@ -53,6 +54,7 @@
         <br/>
         <p><b>中文</b></p >
         <ul>
+            <li><b>Version 5.0.0</b> 修复部分版本兼容问题</li>
             <li><b>Version 4.0.2</b> 删除冗余依赖</li>
             <li><b>Version 4.0.1</b> 新增DDL规则,去掉log4j</li>
             <li><b>Version 4.0.0</b> 优化SQL扫描算法,以及完全国际化</li>
@@ -66,7 +68,7 @@
     </change-notes>
 
     <!-- 兼容的idea版本 -->
-    <idea-version since-build="193.7288.26"/>
+    <idea-version since-build="241.18034.62"/>
 
     <!-- 依赖模块 -->
     <depends>com.intellij.modules.platform</depends>

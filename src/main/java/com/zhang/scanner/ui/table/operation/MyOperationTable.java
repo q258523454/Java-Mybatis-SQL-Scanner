@@ -250,10 +250,10 @@ public class MyOperationTable {
             }
 
             @Override
-            public void edit(@NotNull MyOperationTableRow browser, @NotNull Function<MyOperationTableRow, MyOperationTableRow> mutator, boolean isAdd) {
+            public void edit(@NotNull MyOperationTableRow myOperationTableRow, @NotNull Function<? super MyOperationTableRow, ? extends MyOperationTableRow> function, boolean b) {
                 // TODO
             }
-
+            
 
             @Override
             public void applyEdited(@NotNull MyOperationTableRow oldItem, @NotNull MyOperationTableRow newItem) {

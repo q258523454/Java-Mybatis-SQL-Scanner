@@ -26,7 +26,6 @@
 
 /logs/
 .gradle
-gradle
 
 /src/main/resources/libsource
 /src/main/resources/icons/scanner.vsdx
