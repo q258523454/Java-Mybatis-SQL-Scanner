@@ -33,6 +33,8 @@ configurations.configureEach {
 intellij {
     version.set("2024.1.4")
     plugins = ['java', 'gradle']
+    // updateSinceUntilBuild默认true,会指定until-build,这里手动关闭,表示向上兼容
+    updateSinceUntilBuild.set(false)
 }
 
 java {
