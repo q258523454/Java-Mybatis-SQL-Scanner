@@ -3,6 +3,7 @@ package com.zhang.scanner.listener;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionUiKind;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.ui.PopupHandler;
@@ -76,12 +77,14 @@ public class TreeListener extends PopupHandler {
         NodeDataContext nodeDataContext = new NodeDataContext(executor.getProject(), executor, mapperFileInfo);
         // 创建 ActionEvent
         final ActionManager actionManager = ActionManager.getInstance();
-        AnActionEvent newEvent = new AnActionEvent(e,
-                nodeDataContext,
-                ActionPlaces.UNKNOWN,
+        AnActionEvent newEvent = new AnActionEvent(nodeDataContext,
                 new Presentation(""),
-                ActionManager.getInstance(),
-                0);
+                ActionPlaces.UNKNOWN,
+                ActionUiKind.NONE,
+                e,
+                0,
+                ActionManager.getInstance()
+        );
         // 创建 Action 执行
         CodePreviewAction action = (CodePreviewAction) actionManager.getAction("zhang.action.CodePreviewAction");
         action.actionPerformed(newEvent);
@@ -98,12 +101,14 @@ public class TreeListener extends PopupHandler {
         NodeDataContext nodeDataContext = new NodeDataContext(executor.getProject(), executor, mapperFileInfo, isOpenFile);
         // 创建 ActionEvent
         final ActionManager actionManager = ActionManager.getInstance();
-        AnActionEvent newEvent = new AnActionEvent(e,
-                nodeDataContext,
-                ActionPlaces.UNKNOWN,
+        AnActionEvent newEvent = new AnActionEvent(nodeDataContext,
                 new Presentation(""),
-                ActionManager.getInstance(),
-                0);
+                ActionPlaces.UNKNOWN,
+                ActionUiKind.NONE,
+                e,
+                0,
+                ActionManager.getInstance()
+        );
         // 创建 Action 执行
         RuleResultViewAction action = (RuleResultViewAction) actionManager.getAction("zhang.action.ErrorMsgPreviewAction");
         action.actionPerformed(newEvent);

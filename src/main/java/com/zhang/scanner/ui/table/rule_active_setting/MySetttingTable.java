@@ -207,7 +207,7 @@ public class MySetttingTable {
                      * 可编辑的时候(isEditable=true),点击右边菜单栏窗口触发
                      */
                     @Override
-                    public void edit(@NotNull MySettingRow mySettingRow, @NotNull Function<MySettingRow, MySettingRow> function, boolean b) {
+                    public void edit(@NotNull MySettingRow mySettingRow, @NotNull Function<? super MySettingRow, ? extends MySettingRow> function, boolean b) {
                         // TODO
                     }
 
