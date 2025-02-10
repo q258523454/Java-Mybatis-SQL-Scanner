@@ -30,7 +30,6 @@ public class CodePreviewAction extends GotoActionAction {
 
     private static UsagePreviewPanel usagePreviewPanel = null;
 
-    @Override
     public void actionPerformed(AnActionEvent e) {
         if (!(e.getDataContext() instanceof SimpleDataContext)) {
             return;
@@ -74,7 +73,7 @@ public class CodePreviewAction extends GotoActionAction {
 
         // 如果mapper文件为空,直接返回
         if (mapperName.isEmpty() || null == xmlFile) {
-            usagePreviewPanel.updateLayout(null);
+            usagePreviewPanel.updateLayout(project,null);
             return;
         }
 
@@ -91,8 +90,11 @@ public class CodePreviewAction extends GotoActionAction {
             usageInfoList.add(new UsageInfo(xmlFile, startOffset, endOffset));
         }
 
-        usagePreviewPanel.updateLayout(usageInfoList.isEmpty() ? null : usageInfoList);
-
+        if (usageInfoList.isEmpty()) {
+            usagePreviewPanel.updateLayout(project, null);
+        } else {
+            usagePreviewPanel.updateLayout(project, usageInfoList);
+        }
     }
 
     /**
