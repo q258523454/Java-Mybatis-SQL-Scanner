@@ -2,7 +2,7 @@ package com.zhang.scanner.action.preview;
 
 import com.intellij.ide.actions.GotoActionAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.psi.xml.XmlElement;
@@ -10,8 +10,9 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.PsiNavigateUtil;
 import com.zhang.scanner.executor.TreeConsoleExecutor;
+import com.zhang.scanner.pojo.ClickActionEventObject;
+import com.zhang.scanner.pojo.DataKeyConst;
 import com.zhang.scanner.pojo.MapperFileInfo;
-import com.zhang.scanner.pojo.NodeDataContext;
 import com.zhang.scanner.ui.SqlScanResultPanel;
 import com.zhang.scanner.utils.MapperXmlHelper;
 
@@ -25,17 +26,18 @@ public class RuleResultViewAction extends GotoActionAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        if (!(e.getDataContext() instanceof NodeDataContext)) {
+        if (!(e.getDataContext() instanceof SimpleDataContext)) {
             return;
         }
 
         XmlTag xmlTag = null;
-        NodeDataContext dataContext = (NodeDataContext) e.getDataContext();
+        SimpleDataContext dataContext = (SimpleDataContext) e.getDataContext();
         //  获取project, 等价 e.getProject()
-        Project project = dataContext.getProject();
+        ClickActionEventObject data = dataContext.getData(DataKeyConst.CLICK_ACTION_EVENT_OBJECT_C4);
+        Project project = data.getProject();
 
         // 获取 mapper 文件信息
-        MapperFileInfo mapperFileInfo = dataContext.getMapperFileInfo();
+        MapperFileInfo mapperFileInfo = data.getMapperFileInfo();
         String mapperName = mapperFileInfo.getXmlPluginRuleResult().getMapperName();
         String sqlNodeIdOrg = mapperFileInfo.getXmlPluginRuleResult().getSqlNodeIdOrg();
         String filePath = mapperFileInfo.getXmlPluginRuleResult().getFilePath();
@@ -67,12 +69,12 @@ public class RuleResultViewAction extends GotoActionAction {
         sqlScanResultPanel.getSqlScanResult().setText(parseResult);
         sqlScanResultPanel.setXmlTag(xmlTag);
 
-        TreeConsoleExecutor treeConsoleExecutor = dataContext.getTreeConsoleExecutor();
+        TreeConsoleExecutor treeConsoleExecutor = data.getTreeConsoleExecutor();
         Splitter splitterPanel = treeConsoleExecutor.getSplitterPanel();
         splitterPanel.setSecondComponent(sqlScanResultPanel.getMainPanel());
 
         // 是否同时跳转到指定文件.
-        if (dataContext.isOpenFile()) {
+        if (data.isOpenFile()) {
             if (null != xmlTag) {
                 PsiNavigateUtil.navigate(xmlTag);
             }

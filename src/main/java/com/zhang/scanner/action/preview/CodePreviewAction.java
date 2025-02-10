@@ -4,6 +4,7 @@ import com.intellij.find.FindModel;
 import com.intellij.find.impl.FindInProjectUtil;
 import com.intellij.ide.actions.GotoActionAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.openapi.util.Disposer;
@@ -14,8 +15,9 @@ import com.intellij.usageView.UsageInfo;
 import com.intellij.usages.UsageViewPresentation;
 import com.intellij.usages.impl.UsagePreviewPanel;
 import com.zhang.scanner.executor.TreeConsoleExecutor;
+import com.zhang.scanner.pojo.ClickActionEventObject;
+import com.zhang.scanner.pojo.DataKeyConst;
 import com.zhang.scanner.pojo.MapperFileInfo;
-import com.zhang.scanner.pojo.NodeDataContext;
 import com.zhang.scanner.utils.MapperXmlHelper;
 
 import java.util.ArrayList;
@@ -30,15 +32,17 @@ public class CodePreviewAction extends GotoActionAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        if (!(e.getDataContext() instanceof NodeDataContext)) {
+        if (!(e.getDataContext() instanceof SimpleDataContext)) {
             return;
         }
-        NodeDataContext dataContext = (NodeDataContext) e.getDataContext();
-        TreeConsoleExecutor treeConsoleExecutor = dataContext.getTreeConsoleExecutor();
+
+        SimpleDataContext dataContext = (SimpleDataContext) e.getDataContext();
+        ClickActionEventObject data = dataContext.getData(DataKeyConst.CLICK_ACTION_EVENT_OBJECT_C3);
+        TreeConsoleExecutor treeConsoleExecutor = data.getTreeConsoleExecutor();
         // 获取 split 面板
         Splitter splitterPanel = treeConsoleExecutor.getSplitterPanel();
         //  获取project, 等价 e.getProject()
-        Project project = dataContext.getProject();
+        Project project = data.getProject();
         // 首次创建 Code Previewer 展示面板 才会初始化
         if (null == usagePreviewPanel) {
             usagePreviewPanel = intiUsagePreviewPanel(project);
@@ -49,7 +53,7 @@ public class CodePreviewAction extends GotoActionAction {
         splitterPanel.setSecondComponent(usagePreviewPanel);
 
         // 获取 mapper 文件信息
-        MapperFileInfo mapperFileInfo = dataContext.getMapperFileInfo();
+        MapperFileInfo mapperFileInfo = data.getMapperFileInfo();
         String mapperName = mapperFileInfo.getXmlPluginRuleResult().getMapperName();
         String sqlNodeIdOrg = mapperFileInfo.getXmlPluginRuleResult().getSqlNodeIdOrg();
         String filePath = mapperFileInfo.getXmlPluginRuleResult().getFilePath();
@@ -102,7 +106,6 @@ public class CodePreviewAction extends GotoActionAction {
         myUsagePreviewPanel.setVisible(true);
         return myUsagePreviewPanel;
     }
-
 
 
 }
