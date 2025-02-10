@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.zhang'
-version '4.4.0'
+version '2024.3-PLUS'
 
 repositories {
     mavenCentral()
@@ -32,8 +32,8 @@ configurations.configureEach {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
 //    version.set("2019.3.5")
-    version.set("2024.1.4")
-//    version.set("2024.3.2.2")
+//    version.set("2024.1.4")
+    version.set("2024.3.2.2")
     plugins = ['java', 'gradle']
     // updateSinceUntilBuild默认true,会指定until-build,这里手动关闭,表示向上兼容
     updateSinceUntilBuild.set(false)

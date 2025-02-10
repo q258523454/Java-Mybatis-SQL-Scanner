@@ -21,10 +21,8 @@ import com.zhang.scanner.utils.MapperXmlHelper;
  */
 public class RuleResultViewAction extends GotoActionAction {
 
-
     private static SqlScanResultPanel sqlScanResultPanel = null;
 
-    @Override
     public void actionPerformed(AnActionEvent e) {
         if (!(e.getDataContext() instanceof SimpleDataContext)) {
             return;

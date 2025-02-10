@@ -4,7 +4,12 @@
 
     <!-- 插件的名称和版本, 会在idea插件界面显示 -->
     <name>Java Mybatis SQL Scanner</name>
-    <version>4.4.0</version>
+    <version>2024.3-PLUS</version>
+
+    <!-- 兼容的idea版本 -->
+    <!--    <idea-version since-build="193.7288.26"/>-->
+    <idea-version since-build="243.21565.193"/>
+    <!--    <idea-version since-build="242.21829.142" until-build="242.24807.4"/>-->
 
     <!-- 作者信息 -->
     <vendor email="258523454@qq.com" url="https://zhangxiaofan.blog.csdn.net/">Zhang Jian</vendor>
@@ -66,10 +71,6 @@
         </ul>
     ]]>
     </change-notes>
-
-    <!-- 兼容的idea版本 -->
-<!--    <idea-version since-build="193.7288.26"/>-->
-    <idea-version since-build="242.20224.300" until-build="242.24807.4"/>
 
     <!-- 依赖模块 -->
     <depends>com.intellij.modules.platform</depends>
