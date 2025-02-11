@@ -1,5 +1,6 @@
 package com.zhang.scanner.ui.table.rule_active_setting;
 
+import com.zhang.scanner.utils.LanguageUtil;
 import com.zhang.zmain.enums.DegreeEnum;
 import com.zhang.zmain.enums.RuleCodeEnum;
 import com.zhang.scanner.utils.MyRuleUtil;
@@ -43,7 +44,7 @@ public class MySettingRow implements Serializable {
     }
 
     public String getColRuleDescription() {
-        return this.ruleCodeEnum.getDesc();
+        return this.ruleCodeEnum.getDesc(LanguageUtil.isChinese());
     }
 
 

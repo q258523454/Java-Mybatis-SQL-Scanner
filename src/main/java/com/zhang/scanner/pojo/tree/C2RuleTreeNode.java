@@ -1,5 +1,6 @@
 package com.zhang.scanner.pojo.tree;
 
+import com.zhang.scanner.utils.LanguageUtil;
 import com.zhang.zmain.enums.DegreeEnum;
 import com.zhang.zmain.enums.RuleCodeEnum;
 import com.intellij.ui.treeStructure.SimpleNode;
@@ -21,7 +22,7 @@ public class C2RuleTreeNode extends BaseSimpleNode {
 
     public C2RuleTreeNode(SimpleNode aParent, RuleCodeEnum ruleCodeEnum) {
         // 父节点和name赋值
-        super(aParent, ruleCodeEnum.name() + ":" + ruleCodeEnum.getDesc());
+        super(aParent, ruleCodeEnum.name() + ":" + ruleCodeEnum.getDesc(LanguageUtil.isChinese()));
         this.ruleCodeEnum = ruleCodeEnum;
         if (null != ruleCodeEnum.getDegreeEnum()) {
             DegreeEnum degreeEnum = ruleCodeEnum.getDegreeEnum();

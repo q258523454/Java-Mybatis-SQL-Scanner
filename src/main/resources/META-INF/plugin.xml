@@ -4,7 +4,7 @@
 
     <!-- 插件的名称和版本, 会在idea插件界面显示 -->
     <name>Java Mybatis SQL Scanner</name>
-    <version>2024.3-PLUS2</version>
+    <version>2024.3-PLUS3</version>
 
     <!-- 兼容的idea版本 -->
     <!--    <idea-version since-build="193.7288.26"/>-->
@@ -46,6 +46,7 @@
         <![CDATA[
         <p><b>English</b></p >
         <ul>
+            <li><b>Version 2024.3-PLUS3</b> Support automatic language adaptation.</li>
             <li><b>Version 2024.3-PLUS</b> Fixed compatibility issues.</li>
             <li><b>Version 4.4.1</b> Delete redundant dependencies.</li>
             <li><b>Version 4.0.3</b> Add DDL rules and remove log4j.</li>
@@ -58,6 +59,7 @@
         <br/>
         <p><b>中文</b></p >
         <ul>
+            <li><b>Version 2024.3-PLUS3</b> 支持自动适配IDEA语言</li>
             <li><b>Version 2024.3-PLUS</b> 修复部分版本兼容问题</li>
             <li><b>Version 4.4.1</b> 删除冗余依赖</li>
             <li><b>Version 4.0.3</b> 新增DDL规则,去掉log4j</li>
