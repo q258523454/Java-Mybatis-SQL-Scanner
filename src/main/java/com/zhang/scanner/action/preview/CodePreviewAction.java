@@ -19,6 +19,7 @@ import com.zhang.scanner.pojo.ClickActionEventObject;
 import com.zhang.scanner.pojo.DataKeyConst;
 import com.zhang.scanner.pojo.MapperFileInfo;
 import com.zhang.scanner.utils.MapperXmlHelper;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class CodePreviewAction extends GotoActionAction {
 
         // 如果mapper文件为空,直接返回
         if (mapperName.isEmpty() || null == xmlFile) {
-            usagePreviewPanel.updateLayout(project,null);
+            usagePreviewPanel.updateLayout(project, null);
             return;
         }
 

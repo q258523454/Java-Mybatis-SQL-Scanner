@@ -12,13 +12,13 @@ public enum MyRuleUtil {
      */
     public static MyRuleIcon convertDegreeRuleToRuleIcon(DegreeEnum degreeEnum) {
         if (degreeEnum.equals(DegreeEnum.BLOCKED)) {
-            return com.zhang.scanner.ui.table.rule_active_setting.MyRuleIcon.BLOCKED;
+            return MyRuleIcon.BLOCKED;
         }
         if (degreeEnum.equals(DegreeEnum.CRITICAL)) {
-            return com.zhang.scanner.ui.table.rule_active_setting.MyRuleIcon.CRITICAL;
+            return MyRuleIcon.CRITICAL;
         }
         if (degreeEnum.equals(DegreeEnum.MAJOR)) {
-            return com.zhang.scanner.ui.table.rule_active_setting.MyRuleIcon.MAJOR;
+            return MyRuleIcon.MAJOR;
         }
         return null;
     }

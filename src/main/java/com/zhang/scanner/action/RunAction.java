@@ -40,7 +40,7 @@ public class RunAction extends AnAction {
 
         // 获取底部面板的执行器
         TreeConsoleExecutor executor = (TreeConsoleExecutor) MyExecutorUtil.getRunExecutorInstance(TreeConsoleExecutor.PLUGIN_ID);
-        // 默认 oracle
+        // 默认 mysql
         String dbType = executor.getDbType();
 
         // 构造xml解析器
