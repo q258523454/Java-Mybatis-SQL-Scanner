@@ -1,5 +1,6 @@
 package com.zhang.scanner.utils;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.pom.Navigatable;
@@ -13,6 +14,8 @@ import com.intellij.psi.xml.XmlTag;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public enum MapperXmlHelper {
     ;
@@ -52,12 +55,30 @@ public enum MapperXmlHelper {
      * 返回 指定路径下 mapper 的 PsiFile
      */
     public static XmlFile findPsiFileByMapperNameAndFilePath(Project project, String mapperName, String filePath) {
-        // 查找名称为mapperName的文件
-        PsiFile[] files = PsiShortNamesCache.getInstance(project).getFilesByName(mapperName);
-
+        // 查找名称为mapperName的文件, 下面的方法IDEA不建议使用, 会报错 Slow operations are prohibited on EDT
+        // PsiFile[] files = PsiShortNamesCache.getInstance(project).getFilesByName(mapperName);
+        final PsiFile[][] files = new PsiFile[1][1];
+        CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(new Runnable() {
+            @Override
+            public void run() {
+                ApplicationManager.getApplication().runReadAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 查找名称为mapperName的文件
+                        files[0] = PsiShortNamesCache.getInstance(project).getFilesByName(mapperName);
+                    }
+                });
+            }
+        });
+        try {
+            // 等待线程执行完毕
+            completableFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
         boolean isExist = true;
-        if (files.length > 1) {
-            for (PsiFile file : files) {
+        if (files[0].length > 1) {
+            for (PsiFile file : files[0]) {
                 XmlFile xmlFile = (XmlFile) file;
                 // 获取 psiFile 文件的全路径 (当存在多个同名文件时候,可以用来辅助精准定位.)
                 String psiFilePath = MyPsiUtil.getPsiClassPath(xmlFile);
@@ -72,13 +93,13 @@ public enum MapperXmlHelper {
             isExist = false;
         }
 
-        if (files.length == 0 || !isExist) {
+        if (files[0].length == 0 || !isExist) {
             String message = MessageFormat.format("找不到文件[{0}]", mapperName);
             Messages.showMessageDialog(project, message, "提示", Messages.getInformationIcon());
             return null;
         }
 
-        PsiFile file = files[0];
+        PsiFile file = files[0][0];
         return (XmlFile) file;
     }
 

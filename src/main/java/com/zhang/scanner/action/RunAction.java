@@ -25,7 +25,11 @@ public class RunAction extends AnAction {
     private AnActionEvent event;
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent event) {
+    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+        myActionPerformed(anActionEvent);
+    }
+
+    public void myActionPerformed(@NotNull AnActionEvent event) {
         this.event = event;
         Project project = event.getProject();
         VirtualFile selectedDir = CommonDataKeys.VIRTUAL_FILE.getData(event.getDataContext());
@@ -70,7 +74,7 @@ public class RunAction extends AnAction {
     public void rerun(Project project) {
         if (null != this.event) {
             // 设置restart (再次执行这个action)
-            this.actionPerformed(this.event);
+            this.myActionPerformed(this.event);
         } else {
             Messages.showMessageDialog(project, "未选择目录!请右键待扫描目录.", "提示", Messages.getInformationIcon());
         }

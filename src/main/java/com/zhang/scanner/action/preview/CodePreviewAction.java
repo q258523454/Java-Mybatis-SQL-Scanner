@@ -19,6 +19,7 @@ import com.zhang.scanner.pojo.ClickActionEventObject;
 import com.zhang.scanner.pojo.DataKeyConst;
 import com.zhang.scanner.pojo.MapperFileInfo;
 import com.zhang.scanner.utils.MapperXmlHelper;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,12 @@ public class CodePreviewAction extends GotoActionAction {
 
     private static UsagePreviewPanel usagePreviewPanel = null;
 
-    public void actionPerformed(AnActionEvent e) {
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+        myActionPerformed(anActionEvent);
+    }
+
+    public void myActionPerformed(AnActionEvent e) {
         if (!(e.getDataContext() instanceof SimpleDataContext)) {
             return;
         }

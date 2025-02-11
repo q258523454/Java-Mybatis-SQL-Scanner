@@ -98,7 +98,7 @@ public class TreeListener extends PopupHandler {
         );
         // 创建 Action 执行
         CodePreviewAction action = (CodePreviewAction) actionManager.getAction("zhang.action.CodePreviewAction");
-        action.actionPerformed(newEvent);
+        action.myActionPerformed(newEvent);
     }
 
     /**
@@ -131,6 +131,6 @@ public class TreeListener extends PopupHandler {
         );
         // 创建 Action 执行
         RuleResultViewAction action = (RuleResultViewAction) actionManager.getAction("zhang.action.ErrorMsgPreviewAction");
-        action.actionPerformed(newEvent);
+        action.myActionPerformed(newEvent);
     }
 }

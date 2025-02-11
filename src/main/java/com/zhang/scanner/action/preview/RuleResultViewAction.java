@@ -15,6 +15,7 @@ import com.zhang.scanner.pojo.DataKeyConst;
 import com.zhang.scanner.pojo.MapperFileInfo;
 import com.zhang.scanner.ui.SqlScanResultPanel;
 import com.zhang.scanner.utils.MapperXmlHelper;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 展示扫描结果
@@ -23,7 +24,12 @@ public class RuleResultViewAction extends GotoActionAction {
 
     private static SqlScanResultPanel sqlScanResultPanel = null;
 
-    public void actionPerformed(AnActionEvent e) {
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+        myActionPerformed(anActionEvent);
+    }
+
+    public void myActionPerformed(AnActionEvent e) {
         if (!(e.getDataContext() instanceof SimpleDataContext)) {
             return;
         }
