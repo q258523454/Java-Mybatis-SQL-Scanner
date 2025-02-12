@@ -4,7 +4,7 @@
 
     <!-- 插件的名称和版本, 会在idea插件界面显示 -->
     <name>Java Mybatis SQL Scanner</name>
-    <version>2024.3-PLUS3</version>
+    <version>2024.3-PLUS4</version>
 
     <!-- 兼容的idea版本 -->
     <!--    <idea-version since-build="193.7288.26"/>-->
@@ -86,7 +86,7 @@
         <!--参考官方demo:https://plugins.jetbrains.com/docs/intellij/settings-tutorial.html -->
         <applicationConfigurable parentId="configurable.group.other"
                                  instance="com.zhang.scanner.settings.MySettingsConfig"
-                                 id="MySettingsPersistent"
+                                 id="MySettingsConfig"
                                  displayName="Java Mybatis SQL Scanner Rules"/>
 
         <applicationService serviceImplementation="com.zhang.scanner.settings.MySettingsPersistent"/>

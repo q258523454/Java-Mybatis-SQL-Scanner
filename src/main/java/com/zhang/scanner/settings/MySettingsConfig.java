@@ -17,7 +17,6 @@ public class MySettingsConfig implements Configurable {
 
     private MySettingsView currentView;
 
-
     @Override
     public String getDisplayName() {
         return "Java Mybatis SQL Scanner Rules";
@@ -31,7 +30,12 @@ public class MySettingsConfig implements Configurable {
     @Override
     public JComponent createComponent() {
         currentView = new MySettingsView();
-        return currentView.getTableEditor().createComponent();
+        TableModelEditor<MySettingRow> tableEditor = currentView.getTableEditor();
+        return tableEditor.createComponent();
+    }
+
+    public void init() {
+        this.reset();
     }
 
     /**
@@ -63,21 +67,38 @@ public class MySettingsConfig implements Configurable {
     public void reset() {
         MySettingsPersistent settings = MySettingsPersistent.getInstance();
         List<MySettingRow> ruleSelectedList = settings.ruleSelectedList;
-        // 如果是首次初始化, 或者用户点击了 新增或删除, 重新初始化.
-        if (null == ruleSelectedList || ruleSelectedList.isEmpty() || ruleSelectedList.size() != RuleCodeEnum.values().length) {
-            ListTableModel<MySettingRow> model = currentView.getTableEditor().getModel();
-            for (RuleCodeEnum ruleCodeEnum : RuleCodeEnum.values()) {
-                // 规则等级
-                MySettingRow mySettingRow = new MySettingRow(UUID.randomUUID(), ruleCodeEnum);
-                model.addRow(mySettingRow);
-            }
-            // 持久化到配置
-            settings.ruleSelectedList = model.getItems();
+        // 1.首次初始化
+        if (null == ruleSelectedList || ruleSelectedList.size() <= 0) {
+            initSettings(settings);
+            return;
+        }
+        // 2.用户点击了 新增或删除, 重新初始化.
+        if (ruleSelectedList.size() != RuleCodeEnum.values().length) {
+            initSettings(settings);
+            return;
+        }
+        // 3.特殊情况: 本地存在缓存的时候,重新ruleSelectedList不为空,但是ruleCodeEnum为null
+        if (ruleSelectedList.get(0).getRuleCodeEnum() == null) {
+            initSettings(settings);
             return;
         }
 
         TableModelEditor<MySettingRow> tableEditor = currentView.getTableEditor();
         tableEditor.reset(settings.ruleSelectedList);
+    }
+
+    /**
+     * 初始化用户自定义配置
+     */
+    private void initSettings(MySettingsPersistent settings) {
+        ListTableModel<MySettingRow> model = currentView.getTableEditor().getModel();
+        for (RuleCodeEnum ruleCodeEnum : RuleCodeEnum.values()) {
+            // 规则等级
+            MySettingRow mySettingRow = new MySettingRow(UUID.randomUUID(), ruleCodeEnum);
+            model.addRow(mySettingRow);
+        }
+        // 持久化到配置
+        settings.ruleSelectedList = model.getItems();
     }
 
     /**
@@ -87,6 +108,4 @@ public class MySettingsConfig implements Configurable {
     public void disposeUIResources() {
         currentView = null;
     }
-
-
 }
