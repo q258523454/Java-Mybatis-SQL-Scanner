@@ -64,6 +64,9 @@ public class MySettingRow implements Serializable {
      * 编辑 当前规则是否开启 active
      */
     public void setActive(boolean active) {
+        if (null == this.ruleCodeEnum) {
+            return;
+        }
         this.ruleCodeEnum.setActive(active);
     }
 
@@ -71,7 +74,7 @@ public class MySettingRow implements Serializable {
      * icon 是根据 DegreeEnum 类型来的
      */
     public MyRuleIcon getRuleIcon() {
-        if (null == ruleCodeEnum) {
+        if (null == this.ruleCodeEnum) {
             return MyRuleIcon.BLOCKED;
         }
         return MyRuleUtil.convertDegreeRuleToRuleIcon(this.ruleCodeEnum.getDegreeEnum());
@@ -81,6 +84,9 @@ public class MySettingRow implements Serializable {
      * 编辑 rule icon 同时修改 RuleCodeEnum
      */
     public void setRuleIcon(MyRuleIcon ruleIcon) {
+        if (null == this.ruleCodeEnum) {
+            return;
+        }
         DegreeEnum degreeEnum = MyRuleUtil.convertRuleIconToDegreeEnum(ruleIcon);
         this.ruleCodeEnum.setDegreeEnum(degreeEnum);
     }

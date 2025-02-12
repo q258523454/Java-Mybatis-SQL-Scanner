@@ -4,7 +4,7 @@
 
     <!-- 插件的名称和版本, 会在idea插件界面显示 -->
     <name>Java Mybatis SQL Scanner</name>
-    <version>2024.3-PLUS4</version>
+    <version>2024.3-PLUS5</version>
 
     <!-- 兼容的idea版本 -->
     <!--    <idea-version since-build="193.7288.26"/>-->
