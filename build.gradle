@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.zhang'
-version '2024.3-PLUS5'
+version '2024.3-PLUS6'
 
 repositories {
     mavenCentral()

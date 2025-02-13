@@ -1,19 +1,12 @@
 package com.zhang.scanner;
 
-import com.zhang.zmain.enums.DegreeEnum;
-import com.zhang.zmain.enums.RuleCodeEnum;
-import com.zhang.zmain.pojo.BaseResult;
-import com.zhang.zmain.pojo.ideaPlugin.XmlPluginRuleResult;
-import com.zhang.zmain.pojo.ideaPlugin.XmlPluginRuleResultAll;
-import com.zhang.zmain.util.ResultUtil;
 import com.intellij.execution.DefaultExecutionResult;
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.ExecutionManager;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.RunProfile;
 import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.execution.ui.RunContentManager;
 import com.intellij.execution.ui.RunnerLayoutUi;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
@@ -46,23 +39,31 @@ import com.zhang.scanner.toolbar.TreeExpandToolBar;
 import com.zhang.scanner.ui.table.operation.MyOperationTable;
 import com.zhang.scanner.utils.MyExecutorUtil;
 import com.zhang.scanner.utils.MyIconUtil;
+import com.zhang.zmain.enums.DegreeEnum;
+import com.zhang.zmain.enums.RuleCodeEnum;
+import com.zhang.zmain.pojo.BaseResult;
+import com.zhang.zmain.pojo.ideaPlugin.XmlPluginRuleResult;
+import com.zhang.zmain.pojo.ideaPlugin.XmlPluginRuleResultAll;
+import com.zhang.zmain.util.ResultUtil;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.Icon;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.Icon;
 
 public class ConsoleToolRunner implements Disposable {
 
     /**
      * Project
      */
-    private Project project;
+    private final Project project;
 
-    private RunAction runAction;
+    private final RunAction runAction;
 
     /**
      * 扫描结果
@@ -123,10 +124,11 @@ public class ConsoleToolRunner implements Disposable {
         content.setCloseable(false);
         layoutUi.addContent(content2);
 
-
         // 新增左边工具条
         layoutUi.getOptions().setLeftToolbar(createActionToolbar(myTree), "Toolbar");
-        ExecutionManager.getInstance(project).getContentManager().showRunContent(executor, descriptor);
+        // ExecutionManager.getInstance(this.project).getContentManager() 已过期
+        RunContentManager instance = RunContentManager.getInstance(this.project);
+        instance.showRunContent(executor, descriptor);
     }
 
     private ActionGroup createActionToolbar(Tree tree) {
@@ -208,7 +210,7 @@ public class ConsoleToolRunner implements Disposable {
         RunContentDescriptor descriptor = new RunContentDescriptor(new RunProfile() {
             @Nullable
             @Override
-            public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment environment) throws ExecutionException {
+            public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment environment) {
                 return null;
             }
 
