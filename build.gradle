@@ -1,54 +1,43 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '1.17.0'
-//    id "org.jetbrains.kotlin.jvm" version "1.3.41"
+    // 1.x 版本已经过时了
+    // id 'org.jetbrains.intellij' version '1.17.0'
+    id 'org.jetbrains.intellij.platform' version '2.13.1'
 }
-
 group 'com.zhang'
-version '2024.3-PLUS6'
+version '2026.1-PLUS1'
 
 repositories {
     mavenCentral()
+    // 注意 2.x 必须添加此仓库配置
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
+    // 声明对 IntelliJ IDEA 平台的依赖
+    intellijPlatform {
+        // intellijIdea("2025.3.6.2")
+        intellijIdea("2026.1")
+        // intellijIdea("2026.3")
+        bundledPlugin("com.intellij.java")
+    }
     implementation 'com.alibaba:druid:1.2.8'
-    implementation 'dom4j:dom4j:1.6.1'
-    // slf4j 高版本的ideaIC已经自带实现，不需要额外引用，否则会因为冲突导致报错.
-    // implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
-    // implementation 'org.slf4j:slf4j-jdk14:2.0.0-alpha1'
+    implementation 'org.dom4j:dom4j:2.1.4'
     // 加载本地依赖
-    implementation fileTree(dir:'src/main/resources/libs',includes:['*.jar'])
+    implementation fileTree(dir: 'src/main/resources/libs', includes: ['*.jar'])
     // 系统
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
-configurations.configureEach {
-    // 必须排除,否则dom4j冲突
-    exclude group: 'xml-apis', module: 'xml-apis'
-}
-
-// See https://github.com/JetBrains/gradle-intellij-plugin/
-intellij {
-//    version.set("2019.3.5")
-//    version.set("2024.1.4")
-    version.set("2024.3.2.2")
-    plugins = ['java', 'gradle']
-    // updateSinceUntilBuild默认true,会指定until-build,这里手动关闭,表示向上兼容
-    updateSinceUntilBuild.set(false)
-}
-
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
-apply {
-    "java"
-    "terminal"
-    "ant"
-}
-
+// 测试配置：使用 JUnit 5 平台运行测试
 test {
     useJUnitPlatform()
 }
@@ -74,6 +63,7 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
+// 构建插件时的额外配置（禁止生成搜索选项，可缩短构建时间）
 buildPlugin {
     buildSearchableOptions.enabled = false
 }

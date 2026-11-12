@@ -1,2 +1,8 @@
-rootProject.name = 'Java Mybatis SQL Scanner'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
 
+rootProject.name = 'Java-Mybatis-SQL-Scanner'

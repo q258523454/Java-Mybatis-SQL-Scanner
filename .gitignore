@@ -30,3 +30,6 @@
 /src/main/resources/libsource
 /src/main/resources/icons/scanner.vsdx
 src/main/java/test
+
+.intellijPlatform
+.omc
