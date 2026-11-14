@@ -90,11 +90,21 @@
                   implementation="com.zhang.scanner.executor.TreeConsoleExecutor"/>
 
         <!--参考官方demo:https://plugins.jetbrains.com/docs/intellij/settings-tutorial.html -->
-        <!-- 设置页父节点(Composite 提供子页): Other Settings > Java Mybatis SQL Scanner Rules -->
+        <!-- 设置页父节点: Other Settings > Java Mybatis SQL Scanner Rules -->
         <applicationConfigurable parentId="configurable.group.other"
                                  instance="com.zhang.scanner.settings.ai.ParentSettingsConfig"
                                  id="zhang.scanner.settings.parent"
                                  displayName="Java Mybatis SQL Scanner Rules"/>
+        <!-- 规则开关子页 -->
+        <applicationConfigurable parentId="zhang.scanner.settings.parent"
+                                 instance="com.zhang.scanner.settings.MySettingsConfig"
+                                 id="MySettingsConfig"
+                                 displayName="Rules Settings"/>
+        <!-- AI 模型配置子页 -->
+        <applicationConfigurable parentId="zhang.scanner.settings.parent"
+                                 instance="com.zhang.scanner.settings.ai.AiModelSettingsConfig"
+                                 id="zhang.scanner.settings.ai.model"
+                                 displayName="Model Settings"/>
 
         <applicationService serviceImplementation="com.zhang.scanner.settings.MySettingsPersistent"/>
         <applicationService serviceImplementation="com.zhang.scanner.settings.ai.AiModelSettingsPersistent"/>
