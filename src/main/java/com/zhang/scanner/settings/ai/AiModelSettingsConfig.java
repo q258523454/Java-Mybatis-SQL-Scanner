@@ -97,6 +97,10 @@ public class AiModelSettingsConfig implements SearchableConfigurable {
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 AiApiClient.TestResult result = AiApiClient.testConnection(url, key, model);
                 ApplicationManager.getApplication().invokeLater(() -> {
+                    // 测试期间用户可能已关闭设置对话框(disposeUIResources 置空字段), 需判空
+                    if (null == testButton || null == testResultLabel) {
+                        return;
+                    }
                     testButton.setEnabled(true);
                     testButton.setText("Test Connection");
                     testResultLabel.setForeground(result.ok ? JBColor.GREEN : JBColor.RED);

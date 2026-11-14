@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * DeepSeek / OpenAI 兼容 API 客户端
@@ -221,9 +222,10 @@ public final class AiApiClient {
 
         private volatile boolean cancelled = false;
         private volatile InputStream stream;
+        private volatile CompletableFuture<HttpResponse<InputStream>> future;
 
         /**
-         * 停止生成: 关闭底层输入流使读循环退出
+         * 停止生成: 取消发送中的请求并关闭底层输入流
          */
         public void cancel() {
             cancelled = true;
@@ -235,6 +237,10 @@ public final class AiApiClient {
                     // 忽略关闭异常
                 }
             }
+            CompletableFuture<HttpResponse<InputStream>> f = future;
+            if (null != f) {
+                f.cancel(true);
+            }
         }
 
         private boolean isCancelled() {
@@ -243,6 +249,10 @@ public final class AiApiClient {
 
         private void setStream(InputStream stream) {
             this.stream = stream;
+        }
+
+        private void setFuture(CompletableFuture<HttpResponse<InputStream>> future) {
+            this.future = future;
         }
     }
 
@@ -279,9 +289,17 @@ public final class AiApiClient {
             HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(apiUrl))
                     .header("Authorization", "Bearer " + apiKey)
                     .header("Content-Type", "application/json")
+                    // 请求超时只约束到响应头到达(JDK 语义), 流式 body 读取不受限;
+                    // 防止故障代理接受连接后永不返回响应头导致线程永久挂起
+                    .timeout(Duration.ofSeconds(60))
                     .POST(HttpRequest.BodyPublishers.ofString(buildChatBody(model, systemPrompt, userPrompt)))
                     .build();
-            HttpResponse<InputStream> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+
+            // sendAsync: 用户 Stop 时 future.cancel(true) 可立即中断 send 阻塞
+            CompletableFuture<HttpResponse<InputStream>> future =
+                    client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+            request.setFuture(future);
+            HttpResponse<InputStream> response = future.get();
 
             if (response.statusCode() != 200) {
                 callback.onError(readError(response));
@@ -333,7 +351,6 @@ public final class AiApiClient {
      * 统一解析 SSE 流式响应; 若响应实为完整 JSON(代理不支持流式), 自动按非流式兜底
      */
     private static void parseSseOrFallback(BufferedReader reader, StreamCallback callback) throws IOException {
-        StringBuilder jsonFallback = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
             if (line.isEmpty()) {
@@ -349,17 +366,22 @@ public final class AiApiClient {
                 if (null != delta && !delta.isEmpty()) {
                     callback.onDelta(delta);
                 }
-            } else if (trimmed.startsWith("{")) {
-                // 非 SSE 格式, 收集完整 JSON 行, 稍后按非流式解析
-                jsonFallback.append(trimmed);
+                continue;
+            }
+            if (trimmed.startsWith("{")) {
+                // 非 SSE 完整 JSON: 读入首行与后续所有行(兼容 pretty-printed 多行 JSON)后整体解析
+                StringBuilder jsonBody = new StringBuilder(trimmed);
+                String rest;
+                while ((rest = reader.readLine()) != null) {
+                    jsonBody.append('\n').append(rest);
+                }
+                String content = extractNonStreamContent(jsonBody.toString());
+                if (!content.isEmpty()) {
+                    callback.onDelta(content);
+                }
+                return;
             }
             // 其余行(如 "event:" 等)忽略
-        }
-        if (jsonFallback.length() > 0) {
-            String content = extractNonStreamContent(jsonFallback.toString());
-            if (!content.isEmpty()) {
-                callback.onDelta(content);
-            }
         }
     }
 
