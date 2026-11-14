@@ -11,6 +11,9 @@ Change the database type.
 turn rules on or off.  
 ![](src/main/resources/img/turn.png)    
 
+Ask AI: 点击预览面板的 Ask AI 按钮, 将当前 SQL(格式化 SQL / SQL Type / 报错建议)交给 AI 分析(默认 DeepSeek, 兼容 OpenAI 协议).  
+首次使用请在 `Settings > Other Settings > Java Mybatis SQL Scanner Rules > Model Settings` 中配置 API URL / API Key / Model, 并用 Test Connection 验证配置.
+
 这里开源的是idea插件界面，扫描核心方法在jar包 <b>resources/libs</b>.
 
 [Blog](https://zhangxiaofan.blog.csdn.net/)，find more~  

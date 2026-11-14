@@ -2,10 +2,11 @@ package com.zhang.scanner.settings.ai;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.FormBuilder;
 import com.zhang.scanner.ai.AiApiClient;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JButton;
@@ -23,7 +24,12 @@ import java.util.Objects;
  * Model Settings 设置页: API URL / API Key / Model
  * API Key 输入为密文, 眼睛按钮切换明文
  */
-public class AiModelSettingsConfig implements Configurable {
+public class AiModelSettingsConfig implements SearchableConfigurable {
+
+    /**
+     * 设置页 id(供 ShowSettingsUtil.showSettingsDialog(project, id) 直达)
+     */
+    public static final String ID = "zhang.scanner.settings.ai.model";
 
     private JTextField apiUrlField;
     private JPasswordField apiKeyField;
@@ -31,6 +37,12 @@ public class AiModelSettingsConfig implements Configurable {
     private JButton eyeButton;
     private JButton testButton;
     private JLabel testResultLabel;
+
+    @NotNull
+    @Override
+    public String getId() {
+        return ID;
+    }
 
     @Override
     public String getDisplayName() {
