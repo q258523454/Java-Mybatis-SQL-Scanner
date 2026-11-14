@@ -4,7 +4,6 @@ import com.intellij.execution.Executor;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Splitter;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.treeStructure.Tree;
 import com.zhang.scanner.utils.MyIconUtil;
@@ -132,9 +131,13 @@ public class TreeConsoleExecutor extends Executor implements Disposable {
         this.dbType = dbType;
     }
 
+    /**
+     * 由平台在插件卸载时调用.
+     * 注意: 不能在此调用 Disposer.dispose(this), 否则会对自身递归销毁.
+     */
     @Override
     public void dispose() {
-        Disposer.dispose(this);
+        // 组件状态由平台统一管理, 这里无需处理
     }
 }
 

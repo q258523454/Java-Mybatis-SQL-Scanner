@@ -4,6 +4,10 @@ package com.zhang.scanner.action;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -14,7 +18,6 @@ import com.zhang.zmain.parser.XmlBatisSqlParser;
 import com.zhang.zmain.pojo.BaseResult;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RunAction extends AnAction {
@@ -32,31 +35,51 @@ public class RunAction extends AnAction {
     public void myActionPerformed(@NotNull AnActionEvent event) {
         this.event = event;
         Project project = event.getProject();
+        if (project == null) {
+            return;
+        }
         VirtualFile selectedDir = CommonDataKeys.VIRTUAL_FILE.getData(event.getDataContext());
         if (selectedDir == null) {
             Messages.showMessageDialog(project, "请选择文件", "文件选择错误", Messages.getInformationIcon());
-            throw new RuntimeException("获取选中文件夹失败");
+            return;
         }
 
         // 获取底部面板的执行器
         TreeConsoleExecutor executor = (TreeConsoleExecutor) MyExecutorUtil.getRunExecutorInstance(TreeConsoleExecutor.PLUGIN_ID);
         // 默认 mysql
         String dbType = executor.getDbType();
+        // 当前所选的文件目录path (在 EDT 上取值, 后台线程只使用字符串)
+        String selectedPath = selectedDir.toString().replace("file://", "");
 
-        // 构造xml解析器
-        XmlBatisSqlParser xmlBatisSqlParser = new XmlBatisSqlParser();
-        List<BaseResult> result = new ArrayList<>();
-        try {
-            // 当前所选的文件目录path
-            String selectedPath = selectedDir.toString().replace("file://", "");
-            // 插件直接展示到面板,无需打印日志
-            result = xmlBatisSqlParser.parse(selectedPath, null, dbType);
-        } catch (Exception ex) {
-            throw new RuntimeException("解析异常: " + ex.getMessage());
-        }
-
-        ConsoleToolRunner consoleToolRunner = new ConsoleToolRunner(project, this, result);
-        consoleToolRunner.run();
+        // 扫描(核心解析)属于耗时操作, 禁止在 EDT 上执行, 否则大目录扫描会卡死界面.
+        // 解析完成后回到 EDT 创建结果面板.
+        new Task.Backgroundable(project, "Java Mybatis SQL Scanner: 扫描 Mybatis SQL XML", true) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+                indicator.setText("正在扫描 Mybatis SQL XML...");
+                try {
+                    // 构造xml解析器, 后台线程执行解析
+                    XmlBatisSqlParser xmlBatisSqlParser = new XmlBatisSqlParser();
+                    List<BaseResult> result = xmlBatisSqlParser.parse(selectedPath, null, dbType);
+                    // 结果面板必须回到 EDT 创建
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (project.isDisposed()) {
+                            return;
+                        }
+                        ConsoleToolRunner consoleToolRunner = new ConsoleToolRunner(project, RunAction.this, result);
+                        consoleToolRunner.run();
+                    }, ModalityState.defaultModalityState());
+                } catch (Exception ex) {
+                    // 后台线程不能直接弹框, 回到 EDT 提示
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (!project.isDisposed()) {
+                            Messages.showErrorDialog(project, "解析异常: " + ex.getMessage(), "扫描失败");
+                        }
+                    }, ModalityState.defaultModalityState());
+                }
+            }
+        }.queue();
     }
 
 

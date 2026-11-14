@@ -44,8 +44,7 @@ public class MySettingsConfig implements Configurable {
     @Override
     public boolean isModified() {
         // 有更改
-        // return currentView.getTableEditor().isModified();
-        return false;
+        return currentView.getTableEditor().isModified();
     }
 
     /**
@@ -58,6 +57,8 @@ public class MySettingsConfig implements Configurable {
         ListTableModel<MySettingRow> model = tableEditor.getModel();
         // 持久化到配置, 重启idea不丢失.
         settings.ruleSelectedList = model.getItems();
+        // 同步到扫描核心使用的 RuleCodeEnum 枚举实例(内存态)
+        applyToRuleCodeEnums(settings.ruleSelectedList);
     }
 
     /**
@@ -83,8 +84,27 @@ public class MySettingsConfig implements Configurable {
             return;
         }
 
+        // 将持久化的开关/等级应用到扫描核心使用的 RuleCodeEnum 枚举实例
+        applyToRuleCodeEnums(ruleSelectedList);
+
         TableModelEditor<MySettingRow> tableEditor = currentView.getTableEditor();
         tableEditor.reset(settings.ruleSelectedList);
+    }
+
+    /**
+     * 将每行的 active/degree 同步到 RuleCodeEnum 枚举实例(扫描核心读取的是枚举状态)
+     */
+    private void applyToRuleCodeEnums(List<MySettingRow> rows) {
+        for (MySettingRow row : rows) {
+            RuleCodeEnum rule = row.getRuleCodeEnum();
+            if (null == rule) {
+                continue;
+            }
+            rule.setActive(row.isActive());
+            if (null != row.getDegreeEnum()) {
+                rule.setDegreeEnum(row.getDegreeEnum());
+            }
+        }
     }
 
     /**

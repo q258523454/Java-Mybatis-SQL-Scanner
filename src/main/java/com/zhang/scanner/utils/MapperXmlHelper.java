@@ -7,6 +7,7 @@ import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.xml.XmlFileImpl;
 import com.intellij.psi.search.PsiShortNamesCache;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlElement;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
@@ -41,6 +42,10 @@ public enum MapperXmlHelper {
         // String path = MyPsiUtil.getPsiClassPath(xmlFile);
 
         PsiFile file = files[0];
+        // 索引按文件名查找可能命中同名非 XML 文件(如 .java), 强转前必须确认类型
+        if (!(file instanceof XmlFile)) {
+            return null;
+        }
         XmlFile xmlFile = (XmlFile) file;
         // 非 xml文件,直接返回
         if (null == xmlFile.getDocument()) {
@@ -69,6 +74,10 @@ public enum MapperXmlHelper {
 
         if (files.length > 1) {
             for (PsiFile file : files) {
+                // 索引按文件名查找可能命中同名非 XML 文件(如 .java), 跳过
+                if (!(file instanceof XmlFile)) {
+                    continue;
+                }
                 XmlFile xmlFile = (XmlFile) file;
                 // 获取 psiFile 文件的全路径 (当存在多个同名文件时候,可以用来辅助精准定位.)
                 String psiFilePath = MyPsiUtil.getPsiClassPath(xmlFile);
@@ -83,7 +92,12 @@ public enum MapperXmlHelper {
             return null;
         }
 
-        return (XmlFile) files[0];
+        // 只有一个同名文件时, 同样需要确认是 XML
+        PsiFile singleFile = files[0];
+        if (!(singleFile instanceof XmlFile)) {
+            return null;
+        }
+        return (XmlFile) singleFile;
     }
 
 
@@ -106,7 +120,12 @@ public enum MapperXmlHelper {
         XmlTag[] subTags = rootTag.getSubTags();
         XmlTag targetTag = null;
         for (XmlTag subTag : subTags) {
-            String value = subTag.getAttribute("id").getValue();
+            // <cache/> <cache-ref/> 等标签没有 id 属性, 判空跳过, 否则 getValue() NPE
+            XmlAttribute idAttribute = subTag.getAttribute("id");
+            if (null == idAttribute) {
+                continue;
+            }
+            String value = idAttribute.getValue();
             if (sqlNodeId.equals(value)) {
                 targetTag = subTag;
                 break;

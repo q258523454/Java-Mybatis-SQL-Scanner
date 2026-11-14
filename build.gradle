@@ -5,8 +5,6 @@ plugins {
     // 2.20.0 起支持 IntelliJ Platform 2026.3(263) 的模块化布局, 2.13.1 无法解析其 module-descriptors
     id 'org.jetbrains.intellij.platform' version '2.20.0'
 }
-group 'com.zhang'
-version '2025.1-PLUS1'
 
 repositories {
     mavenCentral()
@@ -83,3 +81,6 @@ intellijPlatform {
         }
     }
 }
+
+group 'com.zhang'
+version '2025.1-PLUS2'

@@ -14,7 +14,6 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Splitter;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.content.Content;
@@ -230,8 +229,11 @@ public class ConsoleToolRunner implements Disposable {
         return descriptor;
     }
 
+    /**
+     * 注意: 不能在此调用 Disposer.dispose(this), 否则会对自身递归销毁.
+     */
     @Override
     public void dispose() {
-        Disposer.dispose(this);
+        // 无需处理
     }
 }

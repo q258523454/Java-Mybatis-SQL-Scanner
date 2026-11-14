@@ -199,8 +199,13 @@ public class MySetttingTable {
                     @Override
                     public MySettingRow clone(@NotNull MySettingRow item, boolean isClickEditButton) {
                         // TableModelEditor.DataChangedListener 已经限制了不能新增和修改
-                        // 因此这里只可能是在表单上直接编辑,每次都新生成 uuid. 只要uuid更改了,就认为有修改.
-                        return new MySettingRow(UUID.randomUUID(), item.getRuleCodeEnum());
+                        // 因此这里只可能是在表单上直接编辑.
+                        // 表格内编辑(forInPlaceEditing=true)必须保留 id, 配合 equals 判断内容是否变化
+                        UUID uuid = isClickEditButton ? item.getId() : UUID.randomUUID();
+                        MySettingRow cloneRow = new MySettingRow(uuid, item.getRuleCodeEnum());
+                        cloneRow.setActive(item.isActive());
+                        cloneRow.setDegreeEnum(item.getDegreeEnum());
+                        return cloneRow;
                     }
 
                     /**
