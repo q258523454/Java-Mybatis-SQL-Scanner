@@ -5,10 +5,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -184,5 +189,231 @@ public final class AiApiClient {
             return "HTTP " + statusCode;
         }
         return "HTTP " + statusCode + ": " + detail;
+    }
+
+    // ==================== 流式聊天 ====================
+
+    /**
+     * 流式聊天回调
+     * 注意: 三个回调都在后台线程触发, 调用方需自行 invokeLater 回 EDT
+     */
+    public interface StreamCallback {
+        /**
+         * 增量文本
+         */
+        void onDelta(String text);
+
+        /**
+         * 正常结束(含用户主动取消)
+         */
+        void onDone();
+
+        /**
+         * 失败(友好文案)
+         */
+        void onError(String friendlyMessage);
+    }
+
+    /**
+     * 流式请求句柄, 用于取消
+     */
+    public static final class StreamRequest {
+
+        private volatile boolean cancelled = false;
+        private volatile InputStream stream;
+
+        /**
+         * 停止生成: 关闭底层输入流使读循环退出
+         */
+        public void cancel() {
+            cancelled = true;
+            InputStream s = stream;
+            if (null != s) {
+                try {
+                    s.close();
+                } catch (Exception ignored) {
+                    // 忽略关闭异常
+                }
+            }
+        }
+
+        private boolean isCancelled() {
+            return cancelled;
+        }
+
+        private void setStream(InputStream stream) {
+            this.stream = stream;
+        }
+    }
+
+    /**
+     * 发起流式聊天请求(立即返回, 内部起后台线程)
+     *
+     * @param apiUrl       完整 chat 端点
+     * @param apiKey       API Key
+     * @param model        模型名
+     * @param systemPrompt 系统提示词
+     * @param userPrompt   用户提示词
+     * @param callback     回调(后台线程触发)
+     */
+    public static StreamRequest startStream(String apiUrl, String apiKey, String model,
+                                            String systemPrompt, String userPrompt, StreamCallback callback) {
+        StreamRequest request = new StreamRequest();
+        Thread thread = new Thread(() -> runStream(apiUrl, apiKey, model, systemPrompt, userPrompt, callback, request),
+                "AskAI-Stream");
+        thread.setDaemon(true);
+        thread.start();
+        return request;
+    }
+
+    /**
+     * 后台线程: 发送请求并解析响应
+     */
+    private static void runStream(String apiUrl, String apiKey, String model,
+                                  String systemPrompt, String userPrompt,
+                                  StreamCallback callback, StreamRequest request) {
+        try {
+            HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(CONNECT_TIMEOUT)
+                    .build();
+            HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(apiUrl))
+                    .header("Authorization", "Bearer " + apiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(buildChatBody(model, systemPrompt, userPrompt)))
+                    .build();
+            HttpResponse<InputStream> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+
+            if (response.statusCode() != 200) {
+                callback.onError(readError(response));
+                return;
+            }
+
+            InputStream input = response.body();
+            request.setStream(input);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
+                parseSseOrFallback(reader, callback);
+                callback.onDone();
+            }
+        } catch (Exception ex) {
+            if (request.isCancelled()) {
+                // 用户主动停止, 视为正常结束
+                callback.onDone();
+            } else {
+                callback.onError("Request failed: " + ex.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 组装 chat 请求体(stream=true, 关闭思考模式)
+     */
+    private static String buildChatBody(String model, String systemPrompt, String userPrompt) {
+        JsonObject systemMsg = new JsonObject();
+        systemMsg.addProperty("role", "system");
+        systemMsg.addProperty("content", systemPrompt);
+        JsonObject userMsg = new JsonObject();
+        userMsg.addProperty("role", "user");
+        userMsg.addProperty("content", userPrompt);
+        JsonArray messages = new JsonArray();
+        messages.add(systemMsg);
+        messages.add(userMsg);
+
+        JsonObject thinking = new JsonObject();
+        thinking.addProperty("type", "disabled");
+
+        JsonObject body = new JsonObject();
+        body.addProperty("model", model);
+        body.add("messages", messages);
+        body.addProperty("stream", true);
+        body.add("thinking", thinking);
+        return body.toString();
+    }
+
+    /**
+     * 统一解析 SSE 流式响应; 若响应实为完整 JSON(代理不支持流式), 自动按非流式兜底
+     */
+    private static void parseSseOrFallback(BufferedReader reader, StreamCallback callback) throws IOException {
+        StringBuilder jsonFallback = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            if (line.isEmpty()) {
+                continue;
+            }
+            String trimmed = line.trim();
+            if (trimmed.startsWith("data:")) {
+                String data = trimmed.substring(5).trim();
+                if ("[DONE]".equals(data)) {
+                    break;
+                }
+                String delta = extractStreamDelta(data);
+                if (null != delta && !delta.isEmpty()) {
+                    callback.onDelta(delta);
+                }
+            } else if (trimmed.startsWith("{")) {
+                // 非 SSE 格式, 收集完整 JSON 行, 稍后按非流式解析
+                jsonFallback.append(trimmed);
+            }
+            // 其余行(如 "event:" 等)忽略
+        }
+        if (jsonFallback.length() > 0) {
+            String content = extractNonStreamContent(jsonFallback.toString());
+            if (!content.isEmpty()) {
+                callback.onDelta(content);
+            }
+        }
+    }
+
+    /**
+     * 从流式 chunk 中提取 delta.content
+     */
+    private static String extractStreamDelta(String data) {
+        try {
+            JsonObject json = JsonParser.parseString(data).getAsJsonObject();
+            JsonArray choices = json.getAsJsonArray("choices");
+            if (null == choices || choices.isEmpty()) {
+                return null;
+            }
+            JsonObject delta = choices.get(0).getAsJsonObject().getAsJsonObject("delta");
+            if (null == delta || !delta.has("content")) {
+                return null;
+            }
+            JsonElement content = delta.get("content");
+            return content.isJsonNull() ? null : content.getAsString();
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * 从非流式完整响应中提取 message.content
+     */
+    private static String extractNonStreamContent(String body) {
+        try {
+            JsonObject json = JsonParser.parseString(body).getAsJsonObject();
+            JsonArray choices = json.getAsJsonArray("choices");
+            if (null == choices || choices.isEmpty()) {
+                return "";
+            }
+            JsonObject message = choices.get(0).getAsJsonObject().getAsJsonObject("message");
+            if (null == message || !message.has("content")) {
+                return "";
+            }
+            JsonElement content = message.get("content");
+            return content.isJsonNull() ? "" : content.getAsString();
+        } catch (Exception ignored) {
+            return "";
+        }
+    }
+
+    /**
+     * 读取非 200 响应的错误信息
+     */
+    private static String readError(HttpResponse<InputStream> response) {
+        try (InputStream in = response.body()) {
+            String body = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            return extractErrorMessage(response.statusCode(), body);
+        } catch (Exception e) {
+            return "HTTP " + response.statusCode();
+        }
     }
 }
