@@ -1,11 +1,12 @@
 package com.zhang.scanner.ui;
 
 
-import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.Splitter;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.PsiNavigateUtil;
 import com.zhang.scanner.ai.AiChatPanel;
@@ -179,7 +180,7 @@ public class SqlScanResultPanel {
                 // 原始 XML 语句(解析前): 从 xmlTag 读取, PSI 访问需持有读锁
                 String rawXml = "";
                 if (null != xmlTag) {
-                    rawXml = ReadAction.compute(() -> xmlTag.getText());
+                    rawXml = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> xmlTag.getText());
                 }
                 AiChatPanel chatPanel = new AiChatPanel(project,
                         sqlNodeId,

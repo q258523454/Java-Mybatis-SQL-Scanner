@@ -5,10 +5,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.Splitter;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.xml.XmlElement;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
@@ -72,10 +72,10 @@ public class RuleResultViewAction extends GotoActionAction {
 
         // 索引查询(FilenameIndex)属于慢操作, 禁止在 EDT 上执行;
         // PSI 访问必须持有读锁.
-        // 因此: 后台线程中通过 ReadAction.compute 完成 索引查询 + PSI 查找,
+        // 因此: 后台线程中通过 runReadAction 完成 索引查询 + PSI 查找,
         // 结果回到 EDT 后设置 xmlTag 并按需跳转.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            XmlTag xmlTag = ReadAction.compute(() -> {
+            XmlTag xmlTag = ApplicationManager.getApplication().runReadAction((Computable<XmlTag>) () -> {
                 // 返回 指定 mapper 的 PsiFile (调用方已持有读锁)
                 XmlFile xmlFile = MapperXmlHelper.findPsiFileByMapperNameAndFilePath(project, mapperName, filePath);
                 if (null == xmlFile) {

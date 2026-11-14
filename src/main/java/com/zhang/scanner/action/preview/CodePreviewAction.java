@@ -7,10 +7,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.Splitter;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.xml.XmlElement;
 import com.intellij.psi.xml.XmlFile;
@@ -77,10 +77,10 @@ public class CodePreviewAction extends GotoActionAction {
 
         // 索引查询(FilenameIndex)属于慢操作, 禁止在 EDT 上执行;
         // PSI 访问与 UsageInfo 创建必须持有读锁.
-        // 因此: 后台线程中通过 ReadAction.compute 完成 索引查询 + PSI 查找 + UsageInfo 创建,
+        // 因此: 后台线程中通过 runReadAction 完成 索引查询 + PSI 查找 + UsageInfo 创建,
         // 结果回到 EDT 后再刷新预览面板.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            List<UsageInfo> usageInfoList = ReadAction.compute(() -> {
+            List<UsageInfo> usageInfoList = ApplicationManager.getApplication().runReadAction((Computable<List<UsageInfo>>) () -> {
                 List<UsageInfo> list = new ArrayList<>();
                 // 返回 指定 mapper 的 PsiFile (调用方已持有读锁)
                 XmlFile xmlFile = MapperXmlHelper.findPsiFileByMapperNameAndFilePath(project, mapperName, filePath);

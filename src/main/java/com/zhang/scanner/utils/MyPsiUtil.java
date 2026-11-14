@@ -5,9 +5,7 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDocumentManager;
@@ -76,8 +74,9 @@ public enum MyPsiUtil {
      * 打开跳转到指定psifile
      */
     public static void openPsiFile(Project project, PsiFile psiFile) {
-        OpenFileDescriptor openFileDescriptor = new OpenFileDescriptor(project, psiFile.getVirtualFile());
-        FileEditorManager fileEditorManager = FileEditorManagerEx.getInstance(project);
-        Editor editor = fileEditorManager.openTextEditor(openFileDescriptor, true);
+        // openTextEditor(OpenFileDescriptor, boolean) 在 2026.1 已废弃, 官方推荐的非阻塞版本
+        // requestOpenTextEditor 依赖的 FileEditorOpenRequest 在 since-build(243) 平台不存在,
+        // 为保证向后兼容, 改用等效且未废弃的 navigate(true): 打开文件 + 定位 + 聚焦.
+        new OpenFileDescriptor(project, psiFile.getVirtualFile()).navigate(true);
     }
 }
