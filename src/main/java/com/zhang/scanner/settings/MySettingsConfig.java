@@ -19,7 +19,7 @@ public class MySettingsConfig implements Configurable {
 
     @Override
     public String getDisplayName() {
-        return "Java Mybatis SQL Scanner Rules";
+        return "Rules Settings";
     }
 
     /**

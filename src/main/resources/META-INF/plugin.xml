@@ -48,6 +48,7 @@
         <![CDATA[
         <p><b>English</b></p>
         <ul>
+            <li><b>Version 2025.1-PLUS2</b> Added "Ask AI" button for AI-powered SQL analysis (DeepSeek-compatible), new Model Settings page with Test Connection</li>
             <li><b>Version 2025.1-PLUS1</b> Fixed UI freezes and abnormal log output when scanning non-XML files</li>
             <li><b>Version 2024.3-PLUS3</b> Support automatic language adaptation</li>
             <li><b>Version 2024.3-PLUS</b> Fixed compatibility issues</li>
@@ -62,6 +63,7 @@
         <br/>
         <p><b>中文</b></p>
         <ul>
+            <li><b>Version 2025.1-PLUS2</b> 新增 "Ask AI" 按钮, 基于 DeepSeek 进行 SQL 智能分析; 新增 Model Settings 设置页与连接测试</li>
             <li><b>Version 2025.1-PLUS1</b> 修复界面卡死和扫描非xml文件异常日志</li>
             <li><b>Version 2024.3-PLUS3</b> 支持自动适配IDEA语言</li>
             <li><b>Version 2024.3-PLUS</b> 修复部分版本兼容问题</li>
@@ -88,12 +90,14 @@
                   implementation="com.zhang.scanner.executor.TreeConsoleExecutor"/>
 
         <!--参考官方demo:https://plugins.jetbrains.com/docs/intellij/settings-tutorial.html -->
+        <!-- 设置页父节点(Composite 提供子页): Other Settings > Java Mybatis SQL Scanner Rules -->
         <applicationConfigurable parentId="configurable.group.other"
-                                 instance="com.zhang.scanner.settings.MySettingsConfig"
-                                 id="MySettingsConfig"
+                                 instance="com.zhang.scanner.settings.ai.ParentSettingsConfig"
+                                 id="zhang.scanner.settings.parent"
                                  displayName="Java Mybatis SQL Scanner Rules"/>
 
         <applicationService serviceImplementation="com.zhang.scanner.settings.MySettingsPersistent"/>
+        <applicationService serviceImplementation="com.zhang.scanner.settings.ai.AiModelSettingsPersistent"/>
 
     </extensions>
 
