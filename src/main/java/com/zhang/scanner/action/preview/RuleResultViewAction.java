@@ -102,8 +102,9 @@ public class RuleResultViewAction extends GotoActionAction {
 
                 // 是否同时跳转到指定文件.
                 if (data.isOpenFile() && null != xmlTag) {
-                    // navigate 内部会访问 PSI(getNavigationElement), 同样需要读锁
-                    ReadAction.run(() -> PsiNavigateUtil.navigate(xmlTag));
+                    // 此处已回到 EDT; navigate 会打开文件编辑器(写操作),
+                    // 禁止用 ReadAction 包裹, 否则触发 WriteIntentReadAction can not be called from ReadAction
+                    PsiNavigateUtil.navigate(xmlTag);
                 }
             }, ModalityState.defaultModalityState());
         });
