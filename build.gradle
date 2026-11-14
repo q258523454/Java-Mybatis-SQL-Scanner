@@ -2,10 +2,11 @@ plugins {
     id 'java'
     // 1.x 版本已经过时了
     // id 'org.jetbrains.intellij' version '1.17.0'
-    id 'org.jetbrains.intellij.platform' version '2.13.1'
+    // 2.20.0 起支持 IntelliJ Platform 2026.3(263) 的模块化布局, 2.13.1 无法解析其 module-descriptors
+    id 'org.jetbrains.intellij.platform' version '2.20.0'
 }
 group 'com.zhang'
-version '2026.1-PLUS1'
+version '2025.1-PLUS1'
 
 repositories {
     mavenCentral()
@@ -18,9 +19,13 @@ repositories {
 dependencies {
     // 声明对 IntelliJ IDEA 平台的依赖
     intellijPlatform {
+        // intellijIdea("2024.3.7.1")
+        intellijIdea("2025.1") // 已下载
         // intellijIdea("2025.3.6.2")
-        intellijIdea("2026.1")
-        // intellijIdea("2026.3")
+        // intellijIdea("2026.1") // 已下载
+        // intellijIdea("2026.2.5") // 已下载
+        // intellijIdea("2026.3") // 已下载
+        // 2026.x 起 IDEA 发行包不再默认捆绑 Java 插件, PsiClass/PsiShortNamesCache 等 Java PSI 类必须显式声明
         bundledPlugin("com.intellij.java")
     }
     implementation 'com.alibaba:druid:1.2.8'
@@ -64,6 +69,17 @@ tasks.withType(JavaCompile) {
 }
 
 // 构建插件时的额外配置（禁止生成搜索选项，可缩短构建时间）
-buildPlugin {
-    buildSearchableOptions.enabled = false
+// 2.x 中需通过 intellijPlatform 扩展关闭 buildSearchableOptions,
+// 否则 buildPlugin 会下载完整 IDE 发行包(dmg)来生成搜索选项索引
+intellijPlatform {
+    buildSearchableOptions = false
+
+    // 显式声明插件兼容范围: 最小 2025.1(251), 最大不限制
+    // 2.x 的 patchPluginXml 默认会按编译目标平台覆盖 since-build, 显式配置后可固定兼容范围
+    pluginConfiguration {
+        ideaVersion {
+            sinceBuild = "251"
+            untilBuild = provider { null }
+        }
+    }
 }

@@ -14,10 +14,6 @@ import com.intellij.psi.xml.XmlTag;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public enum MapperXmlHelper {
     ;
@@ -55,32 +51,24 @@ public enum MapperXmlHelper {
 
     /**
      * 返回 指定路径下 mapper 的 PsiFile
+     * <p>
+     * 注意: 索引查询(PsiShortNamesCache.getFilesByName)属于慢操作,
+     * 禁止在 EDT 上调用本方法, 否则会触发 "Slow operations are prohibited on EDT" 报错.
+     * 调用方必须确保: 1. 已持有读锁(read action); 2. 处于后台线程.
+     * 找不到文件时返回 null, 由调用方在 EDT 上弹框提示.
      */
     public static XmlFile findPsiFileByMapperNameAndFilePath(Project project, String mapperName, String filePath) {
-        // 查找名称为mapperName的文件, 下面的方法IDEA不建议使用, 会报错 Slow operations are prohibited on EDT
-        // PsiFile[] files = PsiShortNamesCache.getInstance(project).getFilesByName(mapperName);
-        final PsiFile[][] files = new PsiFile[1][1];
-        CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(new Runnable() {
-            @Override
-            public void run() {
-                ApplicationManager.getApplication().runReadAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        // 查找名称为mapperName的文件
-                        files[0] = PsiShortNamesCache.getInstance(project).getFilesByName(mapperName);
-                    }
-                });
-            }
-        });
-        try {
-            // 等待线程执行完毕
-            completableFuture.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+        // 调用方需持有读锁, 显式断言以便在开发期尽早暴露误用
+        ApplicationManager.getApplication().assertReadAccessAllowed();
+
+        // 查找名称为mapperName的文件
+        PsiFile[] files = PsiShortNamesCache.getInstance(project).getFilesByName(mapperName);
+        if (files.length == 0) {
+            return null;
         }
-        boolean isExist = true;
-        if (files[0].length > 1) {
-            for (PsiFile file : files[0]) {
+
+        if (files.length > 1) {
+            for (PsiFile file : files) {
                 XmlFile xmlFile = (XmlFile) file;
                 // 获取 psiFile 文件的全路径 (当存在多个同名文件时候,可以用来辅助精准定位.)
                 String psiFilePath = MyPsiUtil.getPsiClassPath(xmlFile);
@@ -92,17 +80,10 @@ public enum MapperXmlHelper {
                     return xmlFile;
                 }
             }
-            isExist = false;
-        }
-
-        if (files[0].length == 0 || !isExist) {
-            String message = MessageFormat.format("找不到文件[{0}]", mapperName);
-            Messages.showMessageDialog(project, message, "提示", Messages.getInformationIcon());
             return null;
         }
 
-        PsiFile file = files[0][0];
-        return (XmlFile) file;
+        return (XmlFile) files[0];
     }
 
 
@@ -115,6 +96,9 @@ public enum MapperXmlHelper {
         if (null == xmlFile || null == sqlNodeId) {
             return null;
         }
+
+        // 调用方需持有读锁, 显式断言以便在开发期尽早暴露误用
+        ApplicationManager.getApplication().assertReadAccessAllowed();
 
         XmlFileImpl xmlFileImpl = (XmlFileImpl) xmlFile;
         // mybatis/ibatis 的 sql tag 都是二级节点.

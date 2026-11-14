@@ -1,6 +1,7 @@
 package com.zhang.scanner.ui;
 
 
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.PsiNavigateUtil;
 
@@ -70,7 +71,8 @@ public class SqlScanResultPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (null != xmlTag) {
-                    PsiNavigateUtil.navigate(xmlTag);
+                    // navigate 内部会访问 PSI(getNavigationElement), 需要持有读锁(read action)
+                    ReadAction.run(() -> PsiNavigateUtil.navigate(xmlTag));
                 }
             }
         });

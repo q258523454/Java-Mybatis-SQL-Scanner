@@ -5,7 +5,11 @@ import com.intellij.find.impl.FindInProjectUtil;
 import com.intellij.ide.actions.GotoActionAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.xml.XmlElement;
@@ -22,6 +26,7 @@ import com.zhang.scanner.utils.MapperXmlHelper;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,44 +69,53 @@ public class CodePreviewAction extends GotoActionAction {
         String sqlNodeIdOrg = mapperFileInfo.getXmlPluginRuleResult().getSqlNodeIdOrg();
         String filePath = mapperFileInfo.getXmlPluginRuleResult().getFilePath();
 
-        // 返回 指定 mapper 的 PsiFile
-        XmlFile xmlFile = MapperXmlHelper.findPsiFileByMapperNameAndFilePath(project, mapperName, filePath);
-        XmlTag openXmlTag = null;
-        if (null != xmlFile) {
-            // 返回指定 mapper 的指定 sqlNodeId 位置的  XmlElement
-            XmlElement xmlElement = MapperXmlHelper.findXmlElement(xmlFile, sqlNodeIdOrg);
-            if (null == xmlElement) {
-                // 找不到对应的 sql id ,则定位到 mapper 根节点
-                openXmlTag = xmlFile.getDocument().getRootTag();
-            } else {
-                openXmlTag = (XmlTag) xmlElement;
-            }
-        }
-
-        // 如果mapper文件为空,直接返回
-        if (mapperName.isEmpty() || null == xmlFile) {
+        // 如果 mapper 名为空, 直接返回
+        if (mapperName.isEmpty()) {
             usagePreviewPanel.updateLayout(project, null);
             return;
         }
 
-        List<UsageInfo> usageInfoList = new ArrayList<>();
-        XmlElement xmlElement = MapperXmlHelper.findXmlElement(xmlFile, sqlNodeIdOrg);
-        if (null == xmlElement) {
-            // 找不到对应的 sql id ,则定位到mapper文件首行
-            usageInfoList.add(new UsageInfo(xmlFile, 0, 0));
-        } else {
-            XmlTag xmlTag = (XmlTag) xmlElement;
-            int startOffset = xmlTag.getTextOffset();
-            int endOffset = startOffset + xmlTag.getName().length();
-            // startOffset:需要跳转的位置 (startOffset,endOffset) 表示一个高亮显示区间
-            usageInfoList.add(new UsageInfo(xmlFile, startOffset, endOffset));
-        }
+        // 索引查询(FilenameIndex)属于慢操作, 禁止在 EDT 上执行;
+        // PSI 访问与 UsageInfo 创建必须持有读锁.
+        // 因此: 后台线程中通过 ReadAction.compute 完成 索引查询 + PSI 查找 + UsageInfo 创建,
+        // 结果回到 EDT 后再刷新预览面板.
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            List<UsageInfo> usageInfoList = ReadAction.compute(() -> {
+                List<UsageInfo> list = new ArrayList<>();
+                // 返回 指定 mapper 的 PsiFile (调用方已持有读锁)
+                XmlFile xmlFile = MapperXmlHelper.findPsiFileByMapperNameAndFilePath(project, mapperName, filePath);
+                if (null == xmlFile) {
+                    // 找不到 mapper 文件, 返回空列表, 由 EDT 回调弹框提示
+                    return list;
+                }
 
-        if (usageInfoList.isEmpty()) {
-            usagePreviewPanel.updateLayout(project, null);
-        } else {
-            usagePreviewPanel.updateLayout(project, usageInfoList);
-        }
+                XmlElement xmlElement = MapperXmlHelper.findXmlElement(xmlFile, sqlNodeIdOrg);
+                if (null == xmlElement) {
+                    // 找不到对应的 sql id ,则定位到mapper文件首行
+                    list.add(new UsageInfo(xmlFile, 0, 0));
+                } else {
+                    XmlTag xmlTag = (XmlTag) xmlElement;
+                    int startOffset = xmlTag.getTextOffset();
+                    int endOffset = startOffset + xmlTag.getName().length();
+                    // startOffset:需要跳转的位置 (startOffset,endOffset) 表示一个高亮显示区间
+                    list.add(new UsageInfo(xmlFile, startOffset, endOffset));
+                }
+                return list;
+            });
+
+            // UI 更新必须回到 EDT 执行
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (usageInfoList.isEmpty()) {
+                    // 找不到 mapper 文件, 弹框提示
+                    Messages.showMessageDialog(project,
+                            MessageFormat.format("找不到文件[{0}]", mapperName),
+                            "提示", Messages.getInformationIcon());
+                    usagePreviewPanel.updateLayout(project, null);
+                } else {
+                    usagePreviewPanel.updateLayout(project, usageInfoList);
+                }
+            }, ModalityState.defaultModalityState());
+        });
     }
 
     /**

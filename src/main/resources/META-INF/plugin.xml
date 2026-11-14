@@ -2,13 +2,15 @@
     <!-- 插件的id，id全局唯一 -->
     <id>com.plugin.sql</id>
 
-    <!-- 插件的名称和版本, 会在idea插件界面显示 -->
+    <!-- 插件的名称, 会在idea插件界面显示 -->
     <name>Java Mybatis SQL Scanner-AI</name>
-    <version>2026.1-PLUS1</version>
 
-    <!-- 兼容的idea版本 -->
+    <!-- 插件版本号统一在 build.gradle 的 version 中维护, 构建时 patchPluginXml 会自动覆盖/插入此处 -->
+
+    <!-- 兼容的idea版本统一在 build.gradle 的 intellijPlatform { pluginConfiguration { ideaVersion { ... } } } 中维护,
+         构建时 patchPluginXml 会覆盖此处的声明, 此处不再维护 -->
     <!--    <idea-version since-build="193.7288.26"/>-->
-    <idea-version since-build="243.21565.193"/>
+    <!--<idea-version since-build="243.21565.193"/>-->
     <!--    <idea-version since-build="242.21829.142" until-build="242.24807.4"/>-->
 
     <!-- 作者信息 -->
@@ -46,11 +48,12 @@
         <![CDATA[
         <p><b>English</b></p>
         <ul>
+            <li><b>Version 2025.1-PLUS1</b> Fixed UI freezes and abnormal log output when scanning non-XML files</li>
             <li><b>Version 2024.3-PLUS3</b> Support automatic language adaptation</li>
             <li><b>Version 2024.3-PLUS</b> Fixed compatibility issues</li>
             <li><b>Version 4.4.1</b> Delete redundant dependencies</li>
             <li><b>Version 4.0.3</b> Add DDL rules and remove log4j</li>
-            <li><b>Version 4.0.0</b> Optimize the SQL scanning algorithm and internationalize the text display.</li>
+            <li><b>Version 4.0.0</b> Optimize the SQL scanning algorithm and internationalize the text display</li>
             <li><b>Version 3.2.5</b> Resolved several issues related to plugin display</li>
             <li><b>Version 3.2.2</b> Now ignores directories specified by containing '.idea' and 'target'</li>
             <li><b>Version 3.2.1</b> Introduced settings to enable or disable individual rules</li>
@@ -59,6 +62,7 @@
         <br/>
         <p><b>中文</b></p>
         <ul>
+            <li><b>Version 2025.1-PLUS1</b> 修复界面卡死和扫描非xml文件异常日志</li>
             <li><b>Version 2024.3-PLUS3</b> 支持自动适配IDEA语言</li>
             <li><b>Version 2024.3-PLUS</b> 修复部分版本兼容问题</li>
             <li><b>Version 4.4.1</b> 删除冗余依赖</li>
