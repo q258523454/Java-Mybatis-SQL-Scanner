@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.zhang.scanner.settings.ai.AiProviderRegistry;
+import com.zhang.scanner.utils.LanguageUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +22,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * DeepSeek / OpenAI 兼容 API 客户端
+ * AI 模型 API 客户端, 支持两种协议:
+ * OpenAI 兼容(chat/completions + Bearer)与 Anthropic Messages(x-api-key + /v1/messages)
  * HTTP 使用 JDK 自带 HttpClient, JSON 使用 IDE 平台自带 Gson
  */
 public final class AiApiClient {
@@ -29,6 +32,16 @@ public final class AiApiClient {
      * 连接超时
      */
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
+
+    /**
+     * Anthropic 协议版本头(2026-10-21, 官方当前版本)
+     */
+    private static final String ANTHROPIC_VERSION = "2026-10-21";
+
+    /**
+     * Claude 请求 max_tokens(官方必填; 流式分析场景 8192 足够)
+     */
+    private static final int CLAUDE_MAX_TOKENS = 8192;
 
     private AiApiClient() {
     }
@@ -48,31 +61,67 @@ public final class AiApiClient {
 
     /**
      * 测试连接是否可用(同步阻塞, 调用方必须在后台线程执行)
-     * 优先 GET {base}/models; 该端点不可用(404/405)时降级为一次非流式极小 chat 请求
+     * 用当前 model 发送一次非流式极小 chat 请求真实验证 URL/Key/Model 三者;
+     * model 不可用但 Key 有效时, 再查询 /models 给出可用模型列表提示
+     *
+     * @param protocol     协议类型(OpenAI 兼容用 Bearer 鉴权, Anthropic 用 x-api-key)
+     * @param thinkingMode thinking 参数策略(极小请求同样按策略组装, 如 GLM-5.x 强制思考)
      */
-    public static TestResult testConnection(String apiUrl, String apiKey, String model) {
+    public static TestResult testConnection(String apiUrl, String apiKey, String model,
+                                            AiProviderRegistry.Protocol protocol,
+                                            AiProviderRegistry.ThinkingMode thinkingMode) {
         try {
             HttpClient client = HttpClient.newBuilder()
                     .connectTimeout(CONNECT_TIMEOUT)
                     .build();
-            HttpRequest request = HttpRequest.newBuilder(deriveModelsUri(apiUrl))
-                    .header("Authorization", "Bearer " + apiKey)
-                    .timeout(Duration.ofSeconds(15))
-                    .GET()
-                    .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                return new TestResult(true, buildModelsMessage(parseModelIds(response.body())));
+            // 1. 真实调用当前 model(极小请求): 模型名无效时此处会失败
+            TestResult mini = testWithMiniChat(client, apiUrl, apiKey, model, protocol, thinkingMode);
+            if (mini.ok) {
+                return new TestResult(true, LanguageUtil.zhOrEn(
+                        "Connection successful (model: " + model + ")",
+                        "连接成功 (模型: " + model + ")"));
             }
-            if (response.statusCode() == 404 || response.statusCode() == 405) {
-                // 该代理不支持 /models 端点, 降级为极小 chat 请求验证
-                return testWithMiniChat(client, apiUrl, apiKey, model);
+            // 2. 鉴权错误(401/403)直接返回, Key 本身无效
+            if (mini.message.startsWith("HTTP 401") || mini.message.startsWith("HTTP 403")) {
+                return mini;
             }
-            // 401/403/5xx 等错误
-            return new TestResult(false, extractErrorMessage(response.statusCode(), response.body()));
+            // 3. 其他失败: 查询 /models 区分"Key 有效但模型无效"并给出可用模型列表
+            try {
+                HttpRequest.Builder builder = HttpRequest.newBuilder(deriveModelsUri(apiUrl))
+                        .timeout(Duration.ofSeconds(15))
+                        .GET();
+                applyAuth(builder, apiKey, protocol);
+                HttpResponse<String> response = client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() == 200) {
+                    List<String> ids = parseModelIds(response.body());
+                    String models = ids.isEmpty() ? "" : " " + LanguageUtil.zhOrEn(
+                            "Available models: ", "可用模型: ") + String.join(", ", ids);
+                    return new TestResult(false, LanguageUtil.zhOrEn(
+                            "API Key is valid, but model \"" + model + "\" is unavailable: " + mini.message,
+                            "API Key 有效, 但模型 \"" + model + "\" 不可用: " + mini.message) + models);
+                }
+            } catch (Exception ignored) {
+                // /models 查询失败, 按 mini chat 错误返回
+            }
+            return mini;
         } catch (Exception ex) {
             return new TestResult(false, "Connection failed: " + ex.getMessage());
         }
+    }
+
+    /**
+     * 按协议给请求附加鉴权头:
+     * OpenAI 兼容 → Authorization: Bearer; Anthropic → x-api-key + anthropic-version
+     */
+    private static HttpRequest.Builder applyAuth(HttpRequest.Builder builder, String apiKey,
+                                                 AiProviderRegistry.Protocol protocol) {
+        if (protocol == AiProviderRegistry.Protocol.ANTHROPIC) {
+            builder.header("x-api-key", apiKey);
+            builder.header("anthropic-version", ANTHROPIC_VERSION);
+        } else {
+            builder.header("Authorization", "Bearer " + apiKey);
+        }
+        return builder;
     }
 
     /**
@@ -117,50 +166,19 @@ public final class AiApiClient {
     }
 
     /**
-     * 拼接可用模型列表文案(最多显示 3 个)
+     * 降级验证: 非流式极小 chat 请求(按协议与 thinking 策略组装)
      */
-    private static String buildModelsMessage(List<String> modelIds) {
-        if (modelIds.isEmpty()) {
-            return "Connection successful";
-        }
-        StringBuilder sb = new StringBuilder("Connection successful. Models: ");
-        for (int i = 0; i < modelIds.size(); i++) {
-            if (i >= 3) {
-                sb.append(", ...");
-                break;
-            }
-            if (i > 0) {
-                sb.append(", ");
-            }
-            sb.append(modelIds.get(i));
-        }
-        return sb.toString();
-    }
-
-    /**
-     * 降级验证: 非流式极小 chat 请求
-     */
-    private static TestResult testWithMiniChat(HttpClient client, String apiUrl, String apiKey, String model) {
+    private static TestResult testWithMiniChat(HttpClient client, String apiUrl, String apiKey, String model,
+                                               AiProviderRegistry.Protocol protocol,
+                                               AiProviderRegistry.ThinkingMode thinkingMode) {
         try {
-            JsonObject message = new JsonObject();
-            message.addProperty("role", "user");
-            message.addProperty("content", "ping");
-            JsonArray messages = new JsonArray();
-            messages.add(message);
-
-            JsonObject body = new JsonObject();
-            body.addProperty("model", model);
-            body.add("messages", messages);
-            body.addProperty("stream", false);
-            body.addProperty("max_tokens", 1);
-
-            HttpRequest request = HttpRequest.newBuilder(URI.create(apiUrl))
-                    .header("Authorization", "Bearer " + apiKey)
+            String body = buildChatBody(model, "", "ping", protocol, thinkingMode, false, 1);
+            HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create(apiUrl))
                     .header("Content-Type", "application/json")
                     .timeout(Duration.ofSeconds(30))
-                    .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
-                    .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                    .POST(HttpRequest.BodyPublishers.ofString(body));
+            applyAuth(builder, apiKey, protocol);
+            HttpResponse<String> response = client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 return new TestResult(true, "Connection successful");
             }
@@ -203,6 +221,13 @@ public final class AiApiClient {
          * 增量文本
          */
         void onDelta(String text);
+
+        /**
+         * 增量思考内容(思考型模型流式输出 reasoning_content, 供界面显示思考进度;
+         * 非思考型模型不触发)
+         */
+        default void onThinking(String text) {
+        }
 
         /**
          * 正常结束(含用户主动取消)
@@ -264,12 +289,18 @@ public final class AiApiClient {
      * @param model        模型名
      * @param systemPrompt 系统提示词
      * @param userPrompt   用户提示词
+     * @param protocol     协议类型(OpenAI 兼容 / Anthropic)
+     * @param thinkingMode thinking 参数策略(各家差异很大, 由供应商预设决定)
      * @param callback     回调(后台线程触发)
      */
     public static StreamRequest startStream(String apiUrl, String apiKey, String model,
-                                            String systemPrompt, String userPrompt, StreamCallback callback) {
+                                            String systemPrompt, String userPrompt,
+                                            AiProviderRegistry.Protocol protocol,
+                                            AiProviderRegistry.ThinkingMode thinkingMode,
+                                            StreamCallback callback) {
         StreamRequest request = new StreamRequest();
-        Thread thread = new Thread(() -> runStream(apiUrl, apiKey, model, systemPrompt, userPrompt, callback, request),
+        Thread thread = new Thread(() -> runStream(apiUrl, apiKey, model, systemPrompt, userPrompt,
+                        protocol, thinkingMode, callback, request),
                 "AskAI-Stream");
         thread.setDaemon(true);
         thread.start();
@@ -281,23 +312,25 @@ public final class AiApiClient {
      */
     private static void runStream(String apiUrl, String apiKey, String model,
                                   String systemPrompt, String userPrompt,
+                                  AiProviderRegistry.Protocol protocol,
+                                  AiProviderRegistry.ThinkingMode thinkingMode,
                                   StreamCallback callback, StreamRequest request) {
         try {
             HttpClient client = HttpClient.newBuilder()
                     .connectTimeout(CONNECT_TIMEOUT)
                     .build();
-            HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(apiUrl))
-                    .header("Authorization", "Bearer " + apiKey)
+            String body = buildChatBody(model, systemPrompt, userPrompt, protocol, thinkingMode, true, null);
+            HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create(apiUrl))
                     .header("Content-Type", "application/json")
                     // 请求超时只约束到响应头到达(JDK 语义), 流式 body 读取不受限;
                     // 防止故障代理接受连接后永不返回响应头导致线程永久挂起
                     .timeout(Duration.ofSeconds(60))
-                    .POST(HttpRequest.BodyPublishers.ofString(buildChatBody(model, systemPrompt, userPrompt)))
-                    .build();
+                    .POST(HttpRequest.BodyPublishers.ofString(body));
+            applyAuth(builder, apiKey, protocol);
 
             // sendAsync: 用户 Stop 时 future.cancel(true) 可立即中断 send 阻塞
             CompletableFuture<HttpResponse<InputStream>> future =
-                    client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+                    client.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
             request.setFuture(future);
             HttpResponse<InputStream> response = future.get();
 
@@ -309,7 +342,11 @@ public final class AiApiClient {
             InputStream input = response.body();
             request.setStream(input);
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
-                parseSseOrFallback(reader, callback);
+                if (protocol == AiProviderRegistry.Protocol.ANTHROPIC) {
+                    parseAnthropicSse(reader, callback);
+                } else {
+                    parseSseOrFallback(reader, callback);
+                }
                 callback.onDone();
             }
         } catch (Exception ex) {
@@ -323,9 +360,34 @@ public final class AiApiClient {
     }
 
     /**
-     * 组装 chat 请求体(stream=true, 关闭思考模式)
+     * 组装 chat 请求体(按协议)
+     *
+     * @param stream       是否流式
+     * @param maxTokens    最大输出 token(null 时 OpenAI 兼容协议不设置, Anthropic 用 CLAUDE_MAX_TOKENS)
      */
-    private static String buildChatBody(String model, String systemPrompt, String userPrompt) {
+    private static String buildChatBody(String model, String systemPrompt, String userPrompt,
+                                        AiProviderRegistry.Protocol protocol,
+                                        AiProviderRegistry.ThinkingMode thinkingMode,
+                                        boolean stream, Integer maxTokens) {
+        if (protocol == AiProviderRegistry.Protocol.ANTHROPIC) {
+            // Anthropic Messages: system 为顶层字段, max_tokens 必填
+            JsonObject body = new JsonObject();
+            body.addProperty("model", model);
+            body.addProperty("max_tokens", null == maxTokens ? CLAUDE_MAX_TOKENS : maxTokens);
+            if (null != systemPrompt && !systemPrompt.isEmpty()) {
+                body.addProperty("system", systemPrompt);
+            }
+            JsonObject userMsg = new JsonObject();
+            userMsg.addProperty("role", "user");
+            userMsg.addProperty("content", userPrompt);
+            JsonArray messages = new JsonArray();
+            messages.add(userMsg);
+            body.add("messages", messages);
+            body.addProperty("stream", stream);
+            return body.toString();
+        }
+
+        // OpenAI 兼容协议
         JsonObject systemMsg = new JsonObject();
         systemMsg.addProperty("role", "system");
         systemMsg.addProperty("content", systemPrompt);
@@ -336,15 +398,88 @@ public final class AiApiClient {
         messages.add(systemMsg);
         messages.add(userMsg);
 
-        JsonObject thinking = new JsonObject();
-        thinking.addProperty("type", "disabled");
-
         JsonObject body = new JsonObject();
         body.addProperty("model", model);
         body.add("messages", messages);
-        body.addProperty("stream", true);
-        body.add("thinking", thinking);
+        body.addProperty("stream", stream);
+        if (null != maxTokens) {
+            body.addProperty("max_tokens", maxTokens);
+        }
+        // thinking 参数策略: DISABLED=关闭思考, ENABLED_LOW=开启+低强度(GLM-5.x 强制), QWEN_OFF=Qwen 关闭思考, NONE=不发
+        if (thinkingMode == AiProviderRegistry.ThinkingMode.DISABLED) {
+            JsonObject thinking = new JsonObject();
+            thinking.addProperty("type", "disabled");
+            body.add("thinking", thinking);
+        } else if (thinkingMode == AiProviderRegistry.ThinkingMode.ENABLED_LOW) {
+            JsonObject thinking = new JsonObject();
+            thinking.addProperty("type", "enabled");
+            thinking.addProperty("reasoning_effort", "low");
+            body.add("thinking", thinking);
+        } else if (thinkingMode == AiProviderRegistry.ThinkingMode.QWEN_OFF) {
+            // Qwen 混合思考模型默认开启思考, 显式关闭显著降低首字延迟与费用
+            body.addProperty("enable_thinking", false);
+        }
         return body.toString();
+    }
+
+    /**
+     * 解析 Anthropic Messages 流式响应(SSE):
+     * 仅取 content_block_delta 事件的 delta.text; 其余事件(content_block_start/message_delta/message_stop 等)忽略
+     */
+    private static void parseAnthropicSse(BufferedReader reader, StreamCallback callback) throws IOException {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String trimmed = line.trim();
+            if (!trimmed.startsWith("data:")) {
+                continue;
+            }
+            String data = trimmed.substring(5).trim();
+            if ("[DONE]".equals(data)) {
+                break;
+            }
+            try {
+                JsonObject json = JsonParser.parseString(data).getAsJsonObject();
+                String type = getJsonString(json, "type");
+                if ("content_block_delta".equals(type)) {
+                    // 文本增量与思考增量都嵌套在 content_block_delta 事件里, 按 delta.type 区分
+                    JsonObject delta = json.getAsJsonObject("delta");
+                    if (null == delta) {
+                        continue;
+                    }
+                    String deltaType = getJsonString(delta, "type");
+                    if ("text_delta".equals(deltaType)) {
+                        JsonElement text = delta.get("text");
+                        if (null != text && !text.isJsonNull()) {
+                            callback.onDelta(text.getAsString());
+                        }
+                    } else if ("thinking_delta".equals(deltaType)) {
+                        // Claude 思考块增量(自适应思考默认开启): 供界面显示思考进度
+                        JsonElement thinking = delta.get("thinking");
+                        if (null != thinking && !thinking.isJsonNull()
+                                && !thinking.getAsString().isEmpty()) {
+                            callback.onThinking(thinking.getAsString());
+                        }
+                    }
+                    // signature_delta 等其他 delta 类型忽略
+                } else if ("error".equals(type)) {
+                    // 流中出现 error 事件(官方允许 200 后携带 error)
+                    JsonObject error = json.getAsJsonObject("error");
+                    callback.onError("Anthropic error: " + getJsonString(error, "message"));
+                    return;
+                }
+                // message_start/content_block_start/content_block_stop/message_delta/message_stop/ping 忽略
+            } catch (Exception ignored) {
+                // 非 JSON 或结构不同, 忽略该行
+            }
+        }
+    }
+
+    /**
+     * 安全读取 JSON 字符串字段(缺失或 null 时返回空串)
+     */
+    private static String getJsonString(JsonObject json, String key) {
+        JsonElement el = json.get(key);
+        return (null != el && !el.isJsonNull()) ? el.getAsString() : "";
     }
 
     /**
@@ -362,10 +497,7 @@ public final class AiApiClient {
                 if ("[DONE]".equals(data)) {
                     break;
                 }
-                String delta = extractStreamDelta(data);
-                if (null != delta && !delta.isEmpty()) {
-                    callback.onDelta(delta);
-                }
+                handleStreamChunk(data, callback);
                 continue;
             }
             if (trimmed.startsWith("{")) {
@@ -386,23 +518,37 @@ public final class AiApiClient {
     }
 
     /**
-     * 从流式 chunk 中提取 delta.content
+     * 处理单个流式 chunk: delta.content → onDelta, delta.reasoning_content → onThinking
+     * 思考型模型(如 GLM/Kimi)在思考阶段只有 reasoning_content、content 为空,
+     * 思考内容通过 onThinking 供界面显示"思考中"进度, 避免用户误以为卡死
      */
-    private static String extractStreamDelta(String data) {
+    private static void handleStreamChunk(String data, StreamCallback callback) {
         try {
             JsonObject json = JsonParser.parseString(data).getAsJsonObject();
             JsonArray choices = json.getAsJsonArray("choices");
             if (null == choices || choices.isEmpty()) {
-                return null;
+                return;
             }
             JsonObject delta = choices.get(0).getAsJsonObject().getAsJsonObject("delta");
-            if (null == delta || !delta.has("content")) {
-                return null;
+            if (null == delta) {
+                return;
             }
             JsonElement content = delta.get("content");
-            return content.isJsonNull() ? null : content.getAsString();
+            if (null != content && !content.isJsonNull()) {
+                String text = content.getAsString();
+                if (!text.isEmpty()) {
+                    callback.onDelta(text);
+                }
+            }
+            JsonElement reasoning = delta.get("reasoning_content");
+            if (null != reasoning && !reasoning.isJsonNull()) {
+                String text = reasoning.getAsString();
+                if (!text.isEmpty()) {
+                    callback.onThinking(text);
+                }
+            }
         } catch (Exception ignored) {
-            return null;
+            // 非 JSON 或结构不同, 忽略该 chunk
         }
     }
 

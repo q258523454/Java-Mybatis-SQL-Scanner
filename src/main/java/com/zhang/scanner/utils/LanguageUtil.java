@@ -28,4 +28,14 @@ public enum LanguageUtil {
         Locale locale = DynamicBundle.getLocale();
         return locale.getLanguage();
     }
+
+    /**
+     * 双语文案选择: IDEA 为中文时返回中文, 其他语言一律返回英文
+     *
+     * @param en 英文文案(默认)
+     * @param zh 中文文案
+     */
+    public static String zhOrEn(String en, String zh) {
+        return isChinese() ? zh : en;
+    }
 }

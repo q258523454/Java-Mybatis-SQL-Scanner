@@ -48,7 +48,8 @@
         <![CDATA[
         <p><b>English</b></p>
         <ul>
-            <li><b>Version 2025.1-PLUS2</b> Added "Ask AI" button for AI-powered SQL analysis (DeepSeek-compatible), new Model Settings page with Test Connection</li>
+            <li><b>Version 2025.1-PLUS3</b> Supports 7 providers (DeepSeek, Qwen, Doubao, GLM, Kimi, GPT, Claude) plus Custom </li>
+            <li><b>Version 2025.1-PLUS2</b> Added "Ask AI" button for AI-powered SQL analysis (DeepSeek-compatible)</li>
             <li><b>Version 2025.1-PLUS1</b> Fixed UI freezes and abnormal log output when scanning non-XML files</li>
             <li><b>Version 2024.3-PLUS3</b> Support automatic language adaptation</li>
             <li><b>Version 2024.3-PLUS</b> Fixed compatibility issues</li>
@@ -63,7 +64,8 @@
         <br/>
         <p><b>中文</b></p>
         <ul>
-            <li><b>Version 2025.1-PLUS2</b> 新增 "Ask AI" 按钮, 基于 DeepSeek 进行 SQL 智能分析; 新增 Model Settings 设置页与连接测试</li>
+            <li><b>Version 2025.1-PLUS3</b> 支持 7 家供应商(DeepSeek、Qwen、Doubao、GLM、Kimi、GPT、Claude)与自定义</li>
+            <li><b>Version 2025.1-PLUS2</b> 新增 "Ask AI" 按钮, 基于 DeepSeek 进行 SQL 智能分析</li>
             <li><b>Version 2025.1-PLUS1</b> 修复界面卡死和扫描非xml文件异常日志</li>
             <li><b>Version 2024.3-PLUS3</b> 支持自动适配IDEA语言</li>
             <li><b>Version 2024.3-PLUS</b> 修复部分版本兼容问题</li>

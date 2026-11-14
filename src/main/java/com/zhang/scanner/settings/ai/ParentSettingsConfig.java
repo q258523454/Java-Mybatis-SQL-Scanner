@@ -4,6 +4,7 @@ import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
+import com.zhang.scanner.utils.LanguageUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,11 +50,17 @@ public class ParentSettingsConfig implements SearchableConfigurable {
         Font titleFont = title.getFont();
         title.setFont(titleFont.deriveFont(Font.BOLD, titleFont.getSize() + 2f));
 
-        JBLabel hint = new JBLabel("请在左侧树中选择要配置的子页面:");
+        JBLabel hint = new JBLabel(LanguageUtil.zhOrEn(
+                "Please select a sub-page in the tree on the left:",
+                "请在左侧树中选择要配置的子页面："));
         hint.setForeground(JBColor.GRAY);
 
-        JBLabel rulesDesc = new JBLabel("• Rules Settings —— 扫描规则开关与规则等级配置");
-        JBLabel modelDesc = new JBLabel("• Model Settings —— AI 模型配置(API URL / API Key / Model)");
+        JBLabel rulesDesc = new JBLabel(LanguageUtil.zhOrEn(
+                "• Rules Settings - Scan rule switches and rule levels",
+                "• Rules Settings - 扫描规则开关与规则等级配置"));
+        JBLabel modelDesc = new JBLabel(LanguageUtil.zhOrEn(
+                "• Model Settings - AI model configuration (API URL / API Key / Model)",
+                "• Model Settings - AI 模型配置(API URL / API Key / Model)"));
 
         content.add(title);
         content.add(Box.createVerticalStrut(12));

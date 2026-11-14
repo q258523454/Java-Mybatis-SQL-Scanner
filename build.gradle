@@ -18,9 +18,9 @@ dependencies {
     // 声明对 IntelliJ IDEA 平台的依赖
     intellijPlatform {
         // intellijIdea("2024.3.7.1")
-        intellijIdea("2025.1") // 已下载
+        // intellijIdea("2025.1") // 已下载
         // intellijIdea("2025.3.6.2")
-        // intellijIdea("2026.1") // 已下载
+        intellijIdea("2026.1") // 已下载
         // intellijIdea("2026.2.5") // 已下载
         // intellijIdea("2026.3") // 已下载
         // 2026.x 起 IDEA 发行包不再默认捆绑 Java 插件, PsiClass/PsiShortNamesCache 等 Java PSI 类必须显式声明
@@ -83,4 +83,4 @@ intellijPlatform {
 }
 
 group 'com.zhang'
-version '2025.1-PLUS2'
+version '2025.1-PLUS3'
