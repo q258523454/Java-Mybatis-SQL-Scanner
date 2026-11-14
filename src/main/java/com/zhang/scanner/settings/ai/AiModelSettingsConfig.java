@@ -1,17 +1,22 @@
 package com.zhang.scanner.settings.ai;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
+import com.intellij.ui.JBColor;
 import com.intellij.util.ui.FormBuilder;
+import com.zhang.scanner.ai.AiApiClient;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.util.Objects;
 
 /**
@@ -24,6 +29,8 @@ public class AiModelSettingsConfig implements Configurable {
     private JPasswordField apiKeyField;
     private JComboBox<String> modelCombo;
     private JButton eyeButton;
+    private JButton testButton;
+    private JLabel testResultLabel;
 
     @Override
     public String getDisplayName() {
@@ -55,10 +62,42 @@ public class AiModelSettingsConfig implements Configurable {
         apiKeyPanel.add(apiKeyField, BorderLayout.CENTER);
         apiKeyPanel.add(eyeButton, BorderLayout.EAST);
 
+        // Test Connection 行: 按钮 + 结果标签
+        testButton = new JButton("Test Connection");
+        testResultLabel = new JLabel(" ");
+        JPanel testRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        testRow.add(testButton);
+        testRow.add(testResultLabel);
+        testButton.addActionListener(e -> {
+            String url = apiUrlField.getText().trim();
+            String key = new String(apiKeyField.getPassword());
+            String model = getModelText();
+            if (url.isEmpty() || key.isEmpty()) {
+                testResultLabel.setForeground(JBColor.RED);
+                testResultLabel.setText("✗ Please fill in API URL and API Key first");
+                return;
+            }
+            // 测试请求在后台线程执行, UI 不阻塞
+            testButton.setEnabled(false);
+            testButton.setText("Testing...");
+            testResultLabel.setForeground(JBColor.foreground());
+            testResultLabel.setText("Testing connection...");
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                AiApiClient.TestResult result = AiApiClient.testConnection(url, key, model);
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    testButton.setEnabled(true);
+                    testButton.setText("Test Connection");
+                    testResultLabel.setForeground(result.ok ? JBColor.GREEN : JBColor.RED);
+                    testResultLabel.setText((result.ok ? "✓ " : "✗ ") + result.message);
+                });
+            });
+        });
+
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent("API URL", apiUrlField)
                 .addLabeledComponent("API Key", apiKeyPanel)
                 .addLabeledComponent("Model", modelCombo)
+                .addComponent(testRow)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }
@@ -105,6 +144,8 @@ public class AiModelSettingsConfig implements Configurable {
         apiKeyField = null;
         modelCombo = null;
         eyeButton = null;
+        testButton = null;
+        testResultLabel = null;
     }
 
     /**
