@@ -74,9 +74,9 @@ public enum MyPsiUtil {
      * 打开跳转到指定psifile
      */
     public static void openPsiFile(Project project, PsiFile psiFile) {
-        // openTextEditor(OpenFileDescriptor, boolean) 在 2026.1 已废弃, 官方推荐的非阻塞版本
-        // requestOpenTextEditor 依赖的 FileEditorOpenRequest 在 since-build(243) 平台不存在,
-        // 为保证向后兼容, 改用等效且未废弃的 navigate(true): 打开文件 + 定位 + 聚焦.
+        // openTextEditor(OpenFileDescriptor, boolean) 自 2026.2 起废弃, 官方推荐非阻塞版本 requestOpenTextEditor;
+        // 但该 API 依赖的 FileEditorOpenRequest 在 since-build(251) 平台不存在, 直接替换会破坏低版本兼容
+        // (运行时 NoSuchMethodError). 为保证向后兼容, 改用等效且未废弃的 navigate(true): 打开文件 + 定位 + 聚焦.
         new OpenFileDescriptor(project, psiFile.getVirtualFile()).navigate(true);
     }
 }

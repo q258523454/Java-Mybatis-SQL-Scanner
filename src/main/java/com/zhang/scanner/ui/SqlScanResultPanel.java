@@ -118,7 +118,7 @@ public class SqlScanResultPanel {
             public void actionPerformed(ActionEvent e) {
                 if (null != xmlTag) {
                     // 按钮回调运行在 EDT 上; navigate 会打开文件编辑器(写操作),
-                    // 禁止用 ReadAction 包裹, 否则触发 WriteIntentReadAction can not be called from ReadAction
+                    // 禁止用读锁(runReadAction)包裹, 否则触发 WriteIntentReadAction can not be called from ReadAction
                     PsiNavigateUtil.navigate(xmlTag);
                 }
             }

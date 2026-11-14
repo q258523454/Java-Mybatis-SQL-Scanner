@@ -103,7 +103,7 @@ public class RuleResultViewAction extends GotoActionAction {
                 // 是否同时跳转到指定文件.
                 if (data.isOpenFile() && null != xmlTag) {
                     // 此处已回到 EDT; navigate 会打开文件编辑器(写操作),
-                    // 禁止用 ReadAction 包裹, 否则触发 WriteIntentReadAction can not be called from ReadAction
+                    // 禁止用读锁(runReadAction)包裹, 否则触发 WriteIntentReadAction can not be called from ReadAction
                     PsiNavigateUtil.navigate(xmlTag);
                 }
             }, ModalityState.defaultModalityState());
