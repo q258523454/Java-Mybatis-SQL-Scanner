@@ -49,7 +49,8 @@ public class RunAction extends AnAction {
         // 默认 mysql
         String dbType = executor.getDbType();
         // 当前所选的文件目录path (在 EDT 上取值, 后台线程只使用字符串)
-        String selectedPath = selectedDir.toString().replace("file://", "");
+        // 必须用 getPath(): toString()/getUrl() 是 URL 形式, 空格中文会变成 %20, Windows 会变成 /C:/, 扫描核心按本地路径处理会找不到文件
+        String selectedPath = selectedDir.getPath();
 
         // 扫描(核心解析)属于耗时操作, 禁止在 EDT 上执行, 否则大目录扫描会卡死界面.
         // 解析完成后回到 EDT 创建结果面板.

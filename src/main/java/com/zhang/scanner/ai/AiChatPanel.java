@@ -1,6 +1,8 @@
 package com.zhang.scanner.ai;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.openapi.editor.colors.EditorFontType;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -106,13 +108,13 @@ public class AiChatPanel {
 
     /**
      * 回答区文本字号(px, 通过 HTMLEditorKit 的 CSS 规则生效)
-     * 构造时从持久化读取, A-/A+ 调整时写回持久化
+     * 用户未显式设置时跟随 IDE Editor Font(限制在 8-24);
+     * 用户点过 A-/A+ 后写回持久化并固定使用
      */
-    private static final int DEFAULT_FONT_SIZE = 14;
-    private static final int MIN_FONT_SIZE = 10;
-    private static final int MAX_FONT_SIZE = 24;
+    private static final int MIN_FONT_SIZE = AiModelSettingsPersistent.MIN_ANSWER_FONT_SIZE;
+    private static final int MAX_FONT_SIZE = AiModelSettingsPersistent.MAX_ANSWER_FONT_SIZE;
     private static final int FONT_SIZE_STEP = 2;
-    private volatile int answerFontSize = DEFAULT_FONT_SIZE;
+    private volatile int answerFontSize = MIN_FONT_SIZE;
 
     /**
      * 思考内容累计字符数(后台线程累加, EDT 读, 用于状态栏显示思考进度)
@@ -165,11 +167,29 @@ public class AiChatPanel {
         this.protocol = preset.protocol;
         this.thinkingMode = preset.thinkingMode;
 
-        // 回答区字号: 从持久化读取(超出范围回退默认), A-/A+ 调整时写回
+        // 回答区字号: 用户显式设置过则用持久化值(夹紧到 8-24), 否则实时跟随 IDE Editor Font
         int persistedSize = settings.answerFontSize;
-        this.answerFontSize = (persistedSize >= MIN_FONT_SIZE && persistedSize <= MAX_FONT_SIZE)
-                ? persistedSize : DEFAULT_FONT_SIZE;
+        if (settings.answerFontSizeExplicit) {
+            this.answerFontSize = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, persistedSize));
+        } else {
+            this.answerFontSize = resolveIdeFontSize();
+        }
         buildUi();
+    }
+
+    /**
+     * 读取 IDE Editor Font 字号作为默认值(限制在 MIN-MAX; 读取失败回退最小值)
+     */
+    private static int resolveIdeFontSize() {
+        try {
+            Font font = EditorColorsManager.getInstance()
+                    .getGlobalScheme()
+                    .getFont(EditorFontType.PLAIN);
+            int size = null == font ? MIN_FONT_SIZE : font.getSize();
+            return Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, size));
+        } catch (Exception e) {
+            return MIN_FONT_SIZE;
+        }
     }
 
     /**
@@ -407,7 +427,7 @@ public class AiChatPanel {
         thinkingArea.setEditable(false);
         thinkingArea.setLineWrap(true);
         thinkingArea.setWrapStyleWord(true);
-        thinkingArea.setFont(new Font(Font.SANS_SERIF, Font.ITALIC, Math.max(10, answerFontSize - 2)));
+        thinkingArea.setFont(new Font(Font.SANS_SERIF, Font.ITALIC, Math.max(MIN_FONT_SIZE, answerFontSize - 2)));
         thinkingArea.setForeground(JBColor.GRAY);
         thinkingArea.setBackground(UIUtil.getEditorPaneBackground());
         thinkingArea.setBorder(JBUI.Borders.empty(2, 6, 2, 6));
@@ -477,20 +497,24 @@ public class AiChatPanel {
         decreaseFontButton.setToolTipText(LanguageUtil.zhOrEn("Decrease text size", "缩小文字"));
         decreaseFontButton.addActionListener(e -> {
             if (answerFontSize > MIN_FONT_SIZE) {
-                answerFontSize -= FONT_SIZE_STEP;
+                answerFontSize = Math.max(MIN_FONT_SIZE, answerFontSize - FONT_SIZE_STEP);
                 applyAnswerFontSize();
-                // 写回持久化, 下次打开对话窗口沿用
-                AiModelSettingsPersistent.getInstance().answerFontSize = answerFontSize;
+                // 写回持久化并标记显式设置, 下次打开对话窗口沿用
+                AiModelSettingsPersistent settings = AiModelSettingsPersistent.getInstance();
+                settings.answerFontSize = answerFontSize;
+                settings.answerFontSizeExplicit = true;
             }
         });
         JButton increaseFontButton = new JButton("A+");
         increaseFontButton.setToolTipText(LanguageUtil.zhOrEn("Increase text size", "放大文字"));
         increaseFontButton.addActionListener(e -> {
             if (answerFontSize < MAX_FONT_SIZE) {
-                answerFontSize += FONT_SIZE_STEP;
+                answerFontSize = Math.min(MAX_FONT_SIZE, answerFontSize + FONT_SIZE_STEP);
                 applyAnswerFontSize();
-                // 写回持久化, 下次打开对话窗口沿用
-                AiModelSettingsPersistent.getInstance().answerFontSize = answerFontSize;
+                // 写回持久化并标记显式设置, 下次打开对话窗口沿用
+                AiModelSettingsPersistent settings = AiModelSettingsPersistent.getInstance();
+                settings.answerFontSize = answerFontSize;
+                settings.answerFontSizeExplicit = true;
             }
         });
         JPanel fontButtonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
@@ -685,7 +709,7 @@ public class AiChatPanel {
         // 思考区字号随回答区联动(比回答区小 2px, 斜体)
         if (null != thinkingArea) {
             thinkingArea.setFont(new Font(Font.SANS_SERIF, Font.ITALIC,
-                    Math.max(10, answerFontSize - 2)));
+                    Math.max(MIN_FONT_SIZE, answerFontSize - 2)));
         }
     }
 

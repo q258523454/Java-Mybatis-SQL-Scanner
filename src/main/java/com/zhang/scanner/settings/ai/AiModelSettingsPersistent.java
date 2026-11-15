@@ -57,9 +57,22 @@ public class AiModelSettingsPersistent implements PersistentStateComponent<AiMod
     public String aiAnswerLanguage = "auto";
 
     /**
-     * AI 回答区文字字号(px, 10-24, A-/A+ 按钮调节并持久化)
+     * 回答区字号合法范围: 8-24(px)
      */
-    public int answerFontSize = 14;
+    public static final int MIN_ANSWER_FONT_SIZE = 8;
+    public static final int MAX_ANSWER_FONT_SIZE = 24;
+
+    /**
+     * AI 回答区文字字号(px, 8-24, A-/A+ 按钮调节并持久化)
+     * 未显式设置时该值只作合法占位(实际显示跟随 IDE Editor Font); 用户点过 A-/A+ 后写入 8-24
+     */
+    public int answerFontSize = MIN_ANSWER_FONT_SIZE;
+
+    /**
+     * 用户是否显式设置过回答区字号
+     * 旧配置没有该字段, 反序列化为 false, 旧字号(14/10 等)一律忽略
+     */
+    public boolean answerFontSizeExplicit = false;
 
     public static AiModelSettingsPersistent getInstance() {
         return ApplicationManager.getApplication().getService(AiModelSettingsPersistent.class);
@@ -165,5 +178,13 @@ public class AiModelSettingsPersistent implements PersistentStateComponent<AiMod
     public void loadState(@NotNull AiModelSettingsPersistent state) {
         XmlSerializerUtil.copyBean(state, this);
         migrateLegacyConfig();
+        // 旧版本没有 answerFontSizeExplicit 字段(默认 false), 旧的 answerFontSize 一律忽略,
+        // 按"未显式设置"处理: 存合法占位值, 实际显示由 AiChatPanel 实时跟随 IDE Editor Font
+        if (!answerFontSizeExplicit) {
+            answerFontSize = MIN_ANSWER_FONT_SIZE;
+        } else {
+            // 显式设置过: 夹紧到 8-24, 修掉历史越界值
+            answerFontSize = Math.max(MIN_ANSWER_FONT_SIZE, Math.min(MAX_ANSWER_FONT_SIZE, answerFontSize));
+        }
     }
 }
