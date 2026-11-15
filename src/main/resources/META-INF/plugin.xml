@@ -3,7 +3,7 @@
     <id>com.plugin.sql</id>
 
     <!-- 插件的名称, 会在idea插件界面显示 -->
-    <name>Java Mybatis SQL Scanner-AI</name>
+    <name>MyBatis SQL Scanner AI</name>
 
     <!-- 插件版本号统一在 build.gradle 的 version 中维护, 构建时 patchPluginXml 会自动覆盖/插入此处 -->
 
@@ -19,26 +19,28 @@
     <description><![CDATA[
     <a href="https://github.com/q258523454/Java-Mybatis-SQL-Scanner">GitHub</a> | <a href="https://blog.csdn.net/q258523454/article/details/123094358?spm=1001.2014.3001.5501">CSDN</a>
     <br/>
-    The plugin can help us to scan mybatis sql xml,which support <b>Mysql</b>, <b>Oracle</b>, <b>Gauss</b>, <b>DB2</b> databases.<br/>
-    <b>English:</b><br/>
-    Please select the directory of a mapper, then right-click and choose the 'execute' option. Alternatively, click on the 'tools' menu and select the 'execute' option after changing the database. <br/>
-    This feature supports MySQL, Oracle, DB2, Gauss, and other databases. <br/>
-    Note:
+    <b>MyBatis SQL Scanner AI — MyBatis/iBatis SQL static analysis and AI code review for IntelliJ IDEA.</b><br/>
+    Scan mapper XML with 20 SQL rules, review findings by severity (Blocked/Critical/Major), and let AI explain and suggest fixes.<br/>
+    Built for Java projects using MyBatis or iBatis; supports MySQL, Oracle, PostgreSQL, DB2, and Gauss.<br/>
+    <br/>
+    <b>How to use:</b><br/>
+    Right-click a directory containing MyBatis mapper XML and select "MyBatis SQL Scanner AI" to scan. Or open the scan panel from the Tools menu, change the default database type, and click execute.<br/>
     <ul>
-        <li>The Executor panel allows you to switch the database type, with the default setting being MySQL.</li>
-        <li>Within the IDEA settings (under 'Other Settings'), you can enable or disable specific rules.</li>
-        <li>The tool supports quick preview, navigation, and offers several SQL repair suggestions..</li>
+        <li>Switch database type in the Executor panel (default: MySQL).</li>
+        <li>Enable or disable rules and adjust rule levels under Other Settings.</li>
+        <li>Quick preview, jump to XML, and SQL repair suggestions.</li>
+        <li>Ask AI: review the SQL found by static analysis — send the raw XML, formatted SQL, SQL type, and scan suggestions to AI (DeepSeek, Qwen, Doubao, GLM, Kimi, GPT, Claude, or a custom endpoint) and get a streaming explanation with visible reasoning.</li>
     </ul>
     <br/>
     <b>中文:</b><br/>
-    这款插件能帮助我们扫描 Mybatis SQL XML 文件,分析出不规范或者潜在风险的SQL。<br/>
-    在idea中右键一个含有 Mybatis Sql Xml的目录，然后选择"Java Mybatis SQL Scanner"执行。或者通过Tools菜单打开执行界面，可以更改默认的数据库类型，再点击执行按钮。<br/>
-    支持：Mysql,Oracle,DB2,Gauss等等。<br/>
+    MyBatis SQL Scanner AI 是针对 MyBatis/iBatis Mapper XML 的 SQL 静态扫描与 AI 代码审查插件, 适用于 IntelliJ IDEA 上的 Java 项目, 支持 MySQL、Oracle、PostgreSQL、DB2、Gauss。<br/>
+    在 IDEA 中右键包含 MyBatis SQL XML 的目录, 选择 "MyBatis SQL Scanner AI" 执行扫描; 或通过 Tools 菜单打开执行界面, 更改默认数据库类型后点击执行。<br/>
     注意：
     <ul>
-        <li>执行面板可以更改数据库类型(默认是:Mysql)。</li>
-        <li>idea中Other Settings设置里面可以调整扫描规则和等级。</li>
-        <li>支持快速预览，快速跳转以及部分SQL修复建议。</li>
+        <li>执行面板可以更改数据库类型(默认: MySQL)。</li>
+        <li>Other Settings 中可以调整扫描规则开关和等级。</li>
+        <li>支持快速预览、快速跳转以及 SQL 修复建议。</li>
+        <li>Ask AI: 把静态扫描发现的 SQL(原始 XML / 格式化 SQL / SQL Type / 报错建议)交给 AI 流式分析, 支持 7 家供应商与自定义端点。</li>
     </ul>
     ]]></description>
 
@@ -48,6 +50,7 @@
         <![CDATA[
         <p><b>English</b></p>
         <ul>
+            <li><b>Version 2025.1-PLUS6</b> Fixed scan failures for paths with spaces or non-ASCII characters; Ask AI font size now follows the IDE editor font and persists your adjustments.</li>
             <li><b>Version 2025.1-PLUS5</b> Supports 7 providers (DeepSeek, Qwen, Doubao, GLM, Kimi, GPT, Claude) plus Custom </li>
             <li><b>Version 2025.1-PLUS2</b> Added "Ask AI" button for AI-powered SQL analysis (DeepSeek-compatible)</li>
             <li><b>Version 2025.1-PLUS1</b> Fixed UI freezes and abnormal log output when scanning non-XML files</li>
@@ -64,6 +67,7 @@
         <br/>
         <p><b>中文</b></p>
         <ul>
+            <li><b>Version 2025.1-PLUS6</b> 修复含空格或中文路径扫描失败的问题; Ask AI 字号默认跟随 IDE 编辑器字体, 并持久化用户的调整。</li>
             <li><b>Version 2025.1-PLUS5</b> 支持 7 家供应商(DeepSeek、Qwen、Doubao、GLM、Kimi、GPT、Claude)与自定义</li>
             <li><b>Version 2025.1-PLUS2</b> 新增 "Ask AI" 按钮, 基于 DeepSeek 进行 SQL 智能分析</li>
             <li><b>Version 2025.1-PLUS1</b> 修复界面卡死和扫描非xml文件异常日志</li>

@@ -1,8 +1,8 @@
 [//]:#DisplayInOneLine
 
-### Java Mybatis SQL Scanner
-This plugin can help us to scan mybatis sql xml:  
-JetBrains Marketplace:[Java Mybatis SQL Scanner](https://plugins.jetbrains.com/plugin/18661-java-mybatis-sql-scanner/)
+### MyBatis SQL Scanner AI
+MyBatis SQL static analysis and AI code review for IntelliJ IDEA. Scan MyBatis/iBatis mapper XML for SQL risks, then let AI explain and suggest fixes.  
+JetBrains Marketplace:[MyBatis SQL Scanner AI](https://plugins.jetbrains.com/plugin/18661)
 ![](src/main/resources/img/guide.gif)
 
 Change the database type.
