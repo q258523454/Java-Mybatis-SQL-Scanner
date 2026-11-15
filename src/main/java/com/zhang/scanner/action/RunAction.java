@@ -54,7 +54,7 @@ public class RunAction extends AnAction {
 
         // 扫描(核心解析)属于耗时操作, 禁止在 EDT 上执行, 否则大目录扫描会卡死界面.
         // 解析完成后回到 EDT 创建结果面板.
-        new Task.Backgroundable(project, "Java Mybatis SQL Scanner: 扫描 Mybatis SQL XML", true) {
+        new Task.Backgroundable(project, "MyBatis SQL Scanner AI: 扫描 MyBatis SQL XML", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);

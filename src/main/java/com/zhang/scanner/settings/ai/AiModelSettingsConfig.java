@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.FormBuilder;
 import com.zhang.scanner.ai.AiApiClient;
 import com.zhang.scanner.utils.LanguageUtil;
@@ -84,6 +85,22 @@ public class AiModelSettingsConfig implements SearchableConfigurable {
         apiKeyField = new JPasswordField();
         modelCombo = new JComboBox<>();
         modelCombo.setEditable(true);
+
+        // Model 下拉可编辑: 常驻提示 + tooltip 让用户知道选中推荐模型后仍可直接输入自定义模型名
+        String modelTip = LanguageUtil.zhOrEn(
+                "Select a recommended model, or type a custom model name.",
+                "可选择推荐模型，也可直接输入自定义模型名。");
+        modelCombo.setToolTipText(modelTip);
+        ((JComponent) modelCombo.getEditor().getEditorComponent()).setToolTipText(modelTip);
+
+        JBLabel modelHint = new JBLabel(LanguageUtil.zhOrEn(
+                "Choose a recommended model, or type a custom model name.",
+                "可选择推荐模型，也可直接输入自定义模型名。"));
+        modelHint.setForeground(JBColor.GRAY);
+
+        JPanel modelPanel = new JPanel(new BorderLayout(0, 2));
+        modelPanel.add(modelCombo, BorderLayout.NORTH);
+        modelPanel.add(modelHint, BorderLayout.SOUTH);
 
         // Provider 下拉框: 选中项显示名随 UI 语言
         providerCombo = new JComboBox<>(AiProviderRegistry.PRESETS.toArray(
@@ -180,7 +197,7 @@ public class AiModelSettingsConfig implements SearchableConfigurable {
                 .addLabeledComponent(LanguageUtil.zhOrEn("Provider", "服务商"), providerCombo)
                 .addLabeledComponent(LanguageUtil.zhOrEn("API URL", "API 地址"), apiUrlField)
                 .addLabeledComponent(LanguageUtil.zhOrEn("API Key", "API 密钥"), apiKeyPanel)
-                .addLabeledComponent(LanguageUtil.zhOrEn("Model", "模型"), modelCombo)
+                .addLabeledComponent(LanguageUtil.zhOrEn("Model", "模型"), modelPanel)
                 .addComponent(testRow)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();

@@ -2,7 +2,7 @@
 
 ## 项目简介
 
-Java Mybatis SQL Scanner 是一个 IntelliJ IDEA 插件（插件 ID：`com.plugin.sql`），用于扫描 MyBatis/iBatis mapper XML，基于 Druid 解析 SQL，按 20 条规则输出 Blocked / Critical / Major 三级问题，提供结果树、表操作统计、代码预览与跳转、规则开关等能力。
+MyBatis SQL Scanner AI 是一个 IntelliJ IDEA 插件（插件 ID：`com.plugin.sql`），用于扫描 MyBatis/iBatis mapper XML，基于 Druid 解析 SQL，按 20 条规则输出 Blocked / Critical / Major 三级问题，提供结果树、表操作统计、代码预览与跳转、规则开关等能力。
 
 此外内置 **Ask AI** 智能分析：把扫描出的 SQL（原始 XML / 格式化 SQL / SQL Type / 报错建议）发给大模型流式分析，支持 7 家供应商（DeepSeek、Qwen、Doubao、GLM、Kimi、GPT、Claude）+ 自定义，每家独立保存 URL/Key/Model，思考过程实时展示，详见 `docs/ask-ai-prompt.md`。
 

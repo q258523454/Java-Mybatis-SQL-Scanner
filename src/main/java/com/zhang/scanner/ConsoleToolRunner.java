@@ -109,7 +109,7 @@ public class ConsoleToolRunner implements Disposable {
 
         // 新增第1个content, 展示 扫描结果
         final Content content = layoutUi.createContent("contentId", splitterPanel,
-                "SQL Scanner", AllIcons.Debugger.Console, splitterPanel);
+                "MyBatis SQL Scanner AI", AllIcons.Debugger.Console, splitterPanel);
         // 不允许关闭
         content.setCloseable(false);
         layoutUi.addContent(content);
@@ -149,7 +149,7 @@ public class ConsoleToolRunner implements Disposable {
         Map<RuleCodeEnum, List<XmlPluginRuleResult>> ruleMap = xmlPluginRuleResultAll.getRuleMap();
 
         // 创建root主节点
-        RootTreeNode root = new RootTreeNode("Mybatis Scanner");
+        RootTreeNode root = new RootTreeNode("MyBatis SQL Scanner AI");
 
         // 创建1级子节点(阻塞,严重,主要),固定顺序
         Map<String, C1DegreeTreeNode> c1DegreeTreeNodeMap = new HashMap<>();
@@ -216,7 +216,7 @@ public class ConsoleToolRunner implements Disposable {
             @NotNull
             @Override
             public String getName() {
-                return "Scanner";
+                return "MyBatis SQL Scanner AI";
             }
 
             @Override

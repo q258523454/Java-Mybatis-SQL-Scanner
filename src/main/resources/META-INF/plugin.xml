@@ -96,11 +96,11 @@
                   implementation="com.zhang.scanner.executor.TreeConsoleExecutor"/>
 
         <!--参考官方demo:https://plugins.jetbrains.com/docs/intellij/settings-tutorial.html -->
-        <!-- 设置页父节点: Other Settings > Java Mybatis SQL Scanner Rules -->
+        <!-- 设置页父节点: Other Settings > MyBatis SQL Scanner AI -->
         <applicationConfigurable parentId="configurable.group.other"
                                  instance="com.zhang.scanner.settings.ai.ParentSettingsConfig"
                                  id="zhang.scanner.settings.parent"
-                                 displayName="Java Mybatis SQL Scanner Rules"/>
+                                 displayName="MyBatis SQL Scanner AI"/>
         <!-- 规则开关子页 -->
         <applicationConfigurable parentId="zhang.scanner.settings.parent"
                                  instance="com.zhang.scanner.settings.MySettingsConfig"
@@ -120,7 +120,7 @@
     <actions>
 
         <action id="zhang.bottom_tool.id" class="com.zhang.scanner.action.ShowRunAction"
-                text="Java Mybatis SQL Scanner-AI" description="Description"
+                text="MyBatis SQL Scanner AI" description="Description"
                 icon="/icons/scanner.svg">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
@@ -143,7 +143,7 @@
                 text="ErrorMsgPreviewAction"/>
 
         <!-- 右键弹窗扫描 -->
-        <action id="zhang.action.basic.PopupDialogAction" text="Java Mybatis SQL Scanner-AI"
+        <action id="zhang.action.basic.PopupDialogAction" text="MyBatis SQL Scanner AI"
                 class="com.zhang.scanner.action.RunAction"
                 description="Description" icon="/icons/scanner.svg">
             <add-to-group anchor="before" group-id="ProjectViewPopupMenu" relative-to-action="FindUsages"/>

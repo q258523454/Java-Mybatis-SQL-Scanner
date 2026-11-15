@@ -20,6 +20,11 @@ public class TreeConsoleExecutor extends Executor implements Disposable {
 
     public static final String PLUGIN_ID = "SQL Plugin ID";
 
+    /**
+     * 插件用户可见显示名(与 plugin.xml <name> 保持一致)
+     */
+    public static final String PLUGIN_NAME = "MyBatis SQL Scanner AI";
+
     public static final String TOOL_WINDOW_ID = "Scanner";
 
 
@@ -73,19 +78,19 @@ public class TreeConsoleExecutor extends Executor implements Disposable {
 
     @Override
     public String getDescription() {
-        return TOOL_WINDOW_ID;
+        return PLUGIN_NAME;
     }
 
     @NotNull
     @Override
     public String getActionName() {
-        return TOOL_WINDOW_ID;
+        return PLUGIN_NAME;
     }
 
     @NotNull
     @Override
     public String getStartActionText() {
-        return TOOL_WINDOW_ID;
+        return PLUGIN_NAME;
     }
 
     @Override

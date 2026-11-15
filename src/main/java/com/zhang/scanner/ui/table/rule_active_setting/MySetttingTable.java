@@ -233,7 +233,7 @@ public class MySetttingTable {
                     }
                 };
 
-        tableEditor = new TableModelEditor<>(COLUMNS, itemEditor, "SQL Scanner Settings")
+        tableEditor = new TableModelEditor<>(COLUMNS, itemEditor, "MyBatis SQL Scanner AI")
                 .modelListener(new TableModelEditor.DataChangedListener<MySettingRow>() {
 
                     /**

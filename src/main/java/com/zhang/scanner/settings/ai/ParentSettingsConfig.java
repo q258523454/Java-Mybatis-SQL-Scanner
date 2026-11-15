@@ -17,7 +17,7 @@ import java.awt.Font;
 
 /**
  * 设置页父节点:
- * Other Settings > Java Mybatis SQL Scanner Rules
+ * Other Settings > MyBatis SQL Scanner AI
  * 下挂 Rules Settings 与 Model Settings 两个子页(子页在 plugin.xml 中通过 parentId 注册)
  * <p>
  * 点击父节点时显示说明面板(避免平台对无内容节点显示占位文案).
@@ -34,7 +34,7 @@ public class ParentSettingsConfig implements SearchableConfigurable {
 
     @Override
     public String getDisplayName() {
-        return "Java Mybatis SQL Scanner Rules";
+        return "MyBatis SQL Scanner AI";
     }
 
     @Nullable
@@ -46,7 +46,7 @@ public class ParentSettingsConfig implements SearchableConfigurable {
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
-        JBLabel title = new JBLabel("Java Mybatis SQL Scanner Rules");
+        JBLabel title = new JBLabel("MyBatis SQL Scanner AI");
         Font titleFont = title.getFont();
         title.setFont(titleFont.deriveFont(Font.BOLD, titleFont.getSize() + 2f));
 

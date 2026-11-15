@@ -1,6 +1,6 @@
 # 架构文档
 
-> 本文档描述 Java Mybatis SQL Scanner 插件的分层架构、核心流程与关键设计。扫描核心为闭源 jar，仅从公开 API 与字节码层面说明契约。
+> 本文档描述 MyBatis SQL Scanner AI 插件的分层架构、核心流程与关键设计。扫描核心为闭源 jar，仅从公开 API 与字节码层面说明契约。
 
 ## 1. 总体架构
 
@@ -55,7 +55,7 @@
 
 ### 4.1 ConsoleToolRunner
 
-- `run()`：创建 `RunnerLayoutUi`，组装左右分屏（结果树 + 预览），添加「SQL Scanner」「Table Operation」两个 Content，注册工具栏，通过 `RunContentManager` 展示
+- `run()`：创建 `RunnerLayoutUi`，组装左右分屏（结果树 + 预览），添加「MyBatis SQL Scanner AI」「Table Operation」两个 Content，注册工具栏，通过 `RunContentManager` 展示
 - `createSimpleTree()`：调用 `ResultUtil.doRuleAll()` 聚合结果，构建四级树（等级 → 规则 → mapper → 明细）
 - 生命周期：实现 `Disposable`，但未注册到 Disposer 树，实际不会被释放
 
