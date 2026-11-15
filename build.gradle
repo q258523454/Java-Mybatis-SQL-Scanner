@@ -53,6 +53,7 @@ sourceSets {
         resources {
             // 打包忽略目录和文件
             exclude 'img/**'
+            exclude 'img_tutorial/**'
             exclude 'libs/**'
             exclude 'libsource/**'
             exclude 'icons/mybatis/**'
