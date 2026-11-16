@@ -50,7 +50,7 @@
         <![CDATA[
         <p><b>English</b></p>
         <ul>
-            <li><b>Version 2025.1-PLUS6</b> Fixed scan failures for paths with spaces or non-ASCII characters; Ask AI font size now follows the IDE editor font and persists your adjustments.</li>
+            <li><b>Version 2025.1-PLUS6</b> Fixed scan failures for paths with spaces or non-ASCII characters; Ask AI font size now follows the IDE editor font and persists your adjustments; API keys are now stored encrypted locally.</li>
             <li><b>Version 2025.1-PLUS5</b> Supports 7 providers (DeepSeek, Qwen, Doubao, GLM, Kimi, GPT, Claude) plus Custom </li>
             <li><b>Version 2025.1-PLUS2</b> Added "Ask AI" button for AI-powered SQL analysis (DeepSeek-compatible)</li>
             <li><b>Version 2025.1-PLUS1</b> Fixed UI freezes and abnormal log output when scanning non-XML files</li>
@@ -67,7 +67,7 @@
         <br/>
         <p><b>中文</b></p>
         <ul>
-            <li><b>Version 2025.1-PLUS6</b> 修复含空格或中文路径扫描失败的问题; Ask AI 字号默认跟随 IDE 编辑器字体, 并持久化用户的调整。</li>
+            <li><b>Version 2025.1-PLUS6</b> 修复含空格或中文路径扫描失败的问题; Ask AI 字号默认跟随 IDE 编辑器字体, 并持久化用户的调整; API Key 改为加密本地存储。</li>
             <li><b>Version 2025.1-PLUS5</b> 支持 7 家供应商(DeepSeek、Qwen、Doubao、GLM、Kimi、GPT、Claude)与自定义</li>
             <li><b>Version 2025.1-PLUS2</b> 新增 "Ask AI" 按钮, 基于 DeepSeek 进行 SQL 智能分析</li>
             <li><b>Version 2025.1-PLUS1</b> 修复界面卡死和扫描非xml文件异常日志</li>

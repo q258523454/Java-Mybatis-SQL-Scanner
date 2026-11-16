@@ -17,7 +17,7 @@ public class AiProviderConfig {
     public String apiUrl = "";
 
     /**
-     * API Key(明文持久化, 按用户要求)
+     * API Key(落盘为 ENC1: 密文, 内存为明文, 见 AiKeyCipher)
      */
     public String apiKey = "";
 

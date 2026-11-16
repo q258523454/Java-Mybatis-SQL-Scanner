@@ -63,7 +63,7 @@ src/main/resources/
 - 扫描核心 jar 为闭源依赖，禁止反编译后改包；升级时需同步 `build.gradle`、`plugin.xml` 的版本号
 - 修改规则说明需同步 `plugin.xml` 的 `change-notes` 与 README
 - AI 相关约定：
-  - API Key 按用户要求**明文持久化**于 `AiModelSettings.xml`，设置页密码框 + 眼睛切换明文
+  - API Key 以 AES-256-GCM 密文(`ENC1:` 前缀)持久化于 `AiModelSettings.xml`，读取时自动解密、旧版本明文配置兼容、下次保存自动转密文；密钥为代码内置常量，属混淆级保护，发布后不可更换；设置页密码框 + 眼睛切换明文
   - AI 回答语言（AI Language 按钮）与 UI 国际化相互独立；UI 文案用 `LanguageUtil.zhOrEn(en, zh)` 双语
   - 供应商预设数据（官方 URL/默认模型/thinking 策略）变更需对照各家官方文档核实
   - Ask AI 不修改扫描/预览/规则逻辑；网络请求一律后台线程，禁止阻塞 EDT

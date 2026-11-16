@@ -5,6 +5,7 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.Transient;
 import com.zhang.scanner.utils.LanguageUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +17,8 @@ import java.util.List;
  * AI 模型配置持久化
  * 多供应商结构: activeProvider + providers(每家独立一套 URL/Key/Model)
  * 旧版本只有 apiUrl/apiKey/model 三字段, 加载后自动迁移为 DeepSeek 槽
- * 注意: API Key 按用户要求明文存储于 AiModelSettings.xml
+ * 注意: API Key 以 AES-256-GCM 密文(ENC1: 前缀)持久化于 AiModelSettings.xml,
+ * 内存中为明文; 旧版本明文配置在读取时兼容, 下次保存时自动转为密文(见 AiKeyCipher)
  */
 @State(
         name = "AiModelSettingsPersistent",
@@ -31,7 +33,7 @@ public class AiModelSettingsPersistent implements PersistentStateComponent<AiMod
     public String apiUrl = "https://api.deepseek.com/v1/chat/completions";
 
     /**
-     * 旧版本字段: API Key(明文持久化), 仅用于旧配置迁移, 新版本请使用 providers
+     * 旧版本字段: API Key(落盘为 ENC1: 密文), 仅用于旧配置迁移, 新版本请使用 providers
      */
     public String apiKey = "";
 
@@ -73,6 +75,14 @@ public class AiModelSettingsPersistent implements PersistentStateComponent<AiMod
      * 旧配置没有该字段, 反序列化为 false, 旧字号(14/10 等)一律忽略
      */
     public boolean answerFontSizeExplicit = false;
+
+    /**
+     * 是否存在无法解密的已加密 Key(密文损坏或密钥不匹配)
+     * loadState 时计算, 不持久化(@Transient); 供设置页 apply() 检测,
+     * 避免用户在不知情时静默清空磁盘上仍存在的密文
+     */
+    @Transient
+    public boolean hasUndecryptableApiKey = false;
 
     public static AiModelSettingsPersistent getInstance() {
         return ApplicationManager.getApplication().getService(AiModelSettingsPersistent.class);
@@ -171,13 +181,45 @@ public class AiModelSettingsPersistent implements PersistentStateComponent<AiMod
     @Nullable
     @Override
     public AiModelSettingsPersistent getState() {
-        return this;
+        // 落盘前返回加密副本, 绝不可修改 this: 内存中必须保持明文, 否则运行中的 Ask AI 会拿到密文
+        AiModelSettingsPersistent copy = new AiModelSettingsPersistent();
+        XmlSerializerUtil.copyBean(this, copy);
+        copy.providers = new ArrayList<>();
+        if (providers != null) {
+            for (AiProviderConfig config : providers) {
+                AiProviderConfig cc = new AiProviderConfig();
+                cc.id = config.id;
+                cc.apiUrl = config.apiUrl;
+                cc.apiKey = AiKeyCipher.encrypt(config.apiKey);
+                cc.model = config.model;
+                copy.providers.add(cc);
+            }
+        }
+        // 旧版单字段同样加密, 避免 XML 残留明文
+        copy.apiKey = AiKeyCipher.encrypt(apiKey);
+        // 运行期标记不持久化, 防御 copyBean 复制了 this 的值
+        copy.hasUndecryptableApiKey = false;
+        return copy;
     }
 
     @Override
     public void loadState(@NotNull AiModelSettingsPersistent state) {
         XmlSerializerUtil.copyBean(state, this);
+        // 记录解密失败的已加密 Key(密文损坏/密钥不匹配), 供设置页保存时提示, 防止静默清空
+        boolean hasUndecryptable = AiKeyCipher.isUndecryptable(apiKey);
+        // 旧版单字段若为密文先解密, 再迁移到 providers(明文旧值经 decrypt 无前缀原样透传, 天然兼容)
+        apiKey = AiKeyCipher.decrypt(apiKey);
         migrateLegacyConfig();
+        // 各家供应商 Key 解密(旧明文无前缀原样透传, 重复解密幂等)
+        if (providers != null) {
+            for (AiProviderConfig config : providers) {
+                if (AiKeyCipher.isUndecryptable(config.apiKey)) {
+                    hasUndecryptable = true;
+                }
+                config.apiKey = AiKeyCipher.decrypt(config.apiKey);
+            }
+        }
+        hasUndecryptableApiKey = hasUndecryptable;
         // 旧版本没有 answerFontSizeExplicit 字段(默认 false), 旧的 answerFontSize 一律忽略,
         // 按"未显式设置"处理: 存合法占位值, 实际显示由 AiChatPanel 实时跟随 IDE Editor Font
         if (!answerFontSizeExplicit) {

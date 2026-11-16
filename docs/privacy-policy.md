@@ -23,7 +23,7 @@ You choose the provider (DeepSeek, Qwen, Doubao, GLM, Kimi, GPT, Claude, or a cu
 
 ## API Key storage
 
-Your API Key is stored locally in the IDE configuration file (`AiModelSettings.xml`) and is used only to authenticate requests to the provider you selected. It is never sent to us.
+Your API Key is stored encrypted in a local IDE configuration file. It is used only to authenticate requests to the provider you selected and is never sent to us.
 
 ## Your responsibility
 

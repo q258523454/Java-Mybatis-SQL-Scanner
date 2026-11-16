@@ -86,7 +86,8 @@ Ask AI 是预览面板（`SqlScanResultPanel`）上的一个独立能力：把�
 | 组件 | 职责 |
 |---|---|
 | `settings/ai/AiProviderRegistry` | 8 家供应商预设静态表：官方 API URL、默认/推荐模型、协议类型（OPENAI_COMPAT / ANTHROPIC）、thinking 策略、官方图标（`resources/icons/ai/`） |
-| `settings/ai/AiProviderConfig` | 单家配置 POJO（id/apiUrl/apiKey/model），XmlSerializer 序列化单元 |
+| `settings/ai/AiProviderConfig` | 单家配置 POJO（id/apiUrl/apiKey/model），XmlSerializer 序列化单元；`apiKey` 落盘为 `ENC1:` AES-256-GCM 密文，内存为明文 |
+| `settings/ai/AiKeyCipher` | API Key 加解密工具（AES-256-GCM，纯 JDK）：旧明文无前缀原样透传，解密失败返回空串；密钥为代码内置常量，发布后不可更换 |
 | `settings/ai/AiModelSettingsPersistent` | 多供应商持久化：`activeProvider` + `providers` 列表 + AI 回答语言 + 回答区字号；旧版本单套三字段在 `loadState` 时自动迁移为 DeepSeek 槽 |
 | `settings/ai/AiModelSettingsConfig` | Model Settings 设置页：Provider 下拉（带图标）、URL/Key/Model（可编辑，切换供应商自动填充）、Test Connection；编辑期内存草稿暂存，OK/Apply 才落盘 |
 | `ai/AiApiClient` | JDK HttpClient + Gson 的双协议客户端：OpenAI 兼容（Bearer）与 Anthropic（x-api-key + anthropic-version）；流式 SSE 解析（含 reasoning/thinking 增量）；thinking 参数按供应商策略（DISABLED / ENABLED_LOW / QWEN_OFF / GPT_LOW / NONE） |

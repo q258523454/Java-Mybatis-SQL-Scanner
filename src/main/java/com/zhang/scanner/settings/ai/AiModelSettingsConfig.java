@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.options.SearchableConfigurable;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.FormBuilder;
@@ -335,16 +336,44 @@ public class AiModelSettingsConfig implements SearchableConfigurable {
         AiProviderRegistry.Preset preset =
                 (AiProviderRegistry.Preset) providerCombo.getSelectedItem();
         settings.activeProvider = null == preset ? currentDraftProviderId : preset.id;
+        // 防护: 存在无法解密的已加密 Key 且保存会把它清空时, 先向用户确认(见 confirmBeforeClearingUndecryptableKey)
+        boolean keepBrokenKey = confirmBeforeClearingUndecryptableKey(settings);
         for (AiProviderConfig draft : drafts.values()) {
             AiProviderConfig persisted = settings.getOrCreateConfig(draft.id);
             persisted.apiUrl = draft.apiUrl;
-            persisted.apiKey = draft.apiKey;
+            boolean skipKeyWrite = keepBrokenKey && (draft.apiKey == null || draft.apiKey.isEmpty());
+            if (!skipKeyWrite) {
+                persisted.apiKey = draft.apiKey;
+            }
             persisted.model = draft.model;
         }
         // 旧版本字段已迁移, 置空避免 XML 冗余
         settings.apiUrl = "";
         settings.apiKey = "";
         settings.model = "";
+    }
+
+    /**
+     * loadState 标记存在无法解密的已加密 Key(密文损坏/密钥不匹配)时弹确认框;
+     * 用户选择"保留原值"则跳过空 Key 的写入, 磁盘上仍存的密文不被静默清空
+     *
+     * @return true 表示跳过空 Key 写入(保留原值)
+     */
+    private boolean confirmBeforeClearingUndecryptableKey(AiModelSettingsPersistent settings) {
+        if (!settings.hasUndecryptableApiKey) {
+            return false;
+        }
+        int choice = Messages.showYesNoDialog(
+                LanguageUtil.zhOrEn(
+                        "A previously saved API Key cannot be decrypted (corrupted config or incompatible version). "
+                                + "Saving now will clear it and you will need to re-enter the key. Continue?",
+                        "存在无法解密的已保存 API Key(配置损坏或版本不兼容)。"
+                                + "继续保存将清空该 Key, 之后需要重新填写。是否继续?"),
+                LanguageUtil.zhOrEn("API Key", "API Key 提示"),
+                LanguageUtil.zhOrEn("Continue", "继续"),
+                LanguageUtil.zhOrEn("Keep Old Value", "保留原值"),
+                Messages.getQuestionIcon());
+        return choice == Messages.NO;
     }
 
     /**
