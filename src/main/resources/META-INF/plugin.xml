@@ -50,34 +50,28 @@
         <![CDATA[
         <p><b>English</b></p>
         <ul>
-            <li><b>Version 2025.1-PLUS6</b> Fixed scan failures for paths with spaces or non-ASCII characters; Ask AI font size now follows the IDE editor font and persists your adjustments; API keys are now stored encrypted locally.</li>
+            <li><b>Version 2025.1-PLUS7</b> API keys stored encrypted locally</li>
+            <li><b>Version 2025.1-PLUS6</b> Ask AI font size now follows the IDE editor font and persists your adjustments</li>
             <li><b>Version 2025.1-PLUS5</b> Supports 7 providers (DeepSeek, Qwen, Doubao, GLM, Kimi, GPT, Claude) plus Custom </li>
             <li><b>Version 2025.1-PLUS2</b> Added "Ask AI" button for AI-powered SQL analysis (DeepSeek-compatible)</li>
             <li><b>Version 2025.1-PLUS1</b> Fixed UI freezes and abnormal log output when scanning non-XML files</li>
             <li><b>Version 2024.3-PLUS3</b> Support automatic language adaptation</li>
             <li><b>Version 2024.3-PLUS</b> Fixed compatibility issues</li>
-            <li><b>Version 4.4.1</b> Delete redundant dependencies</li>
-            <li><b>Version 4.0.3</b> Add DDL rules and remove log4j</li>
             <li><b>Version 4.0.0</b> Optimize the SQL scanning algorithm and internationalize the text display</li>
-            <li><b>Version 3.2.5</b> Resolved several issues related to plugin display</li>
-            <li><b>Version 3.2.2</b> Now ignores directories specified by containing '.idea' and 'target'</li>
             <li><b>Version 3.2.1</b> Introduced settings to enable or disable individual rules</li>
             <li><b>Version 2.1.0</b> Added support for MySQL, Oracle, Gauss, PostgreSQL, and DB2 databases</li>
         </ul>
         <br/>
         <p><b>中文</b></p>
         <ul>
-            <li><b>Version 2025.1-PLUS6</b> 修复含空格或中文路径扫描失败的问题; Ask AI 字号默认跟随 IDE 编辑器字体, 并持久化用户的调整; API Key 改为加密本地存储。</li>
+            <li><b>Version 2025.1-PLUS7</b> API Key 改为加密本地存储</li>
+            <li><b>Version 2025.1-PLUS6</b> Ask AI 字号默认跟随 IDE 编辑器字体, 并持久化用户的调整</li>
             <li><b>Version 2025.1-PLUS5</b> 支持 7 家供应商(DeepSeek、Qwen、Doubao、GLM、Kimi、GPT、Claude)与自定义</li>
             <li><b>Version 2025.1-PLUS2</b> 新增 "Ask AI" 按钮, 基于 DeepSeek 进行 SQL 智能分析</li>
             <li><b>Version 2025.1-PLUS1</b> 修复界面卡死和扫描非xml文件异常日志</li>
             <li><b>Version 2024.3-PLUS3</b> 支持自动适配IDEA语言</li>
             <li><b>Version 2024.3-PLUS</b> 修复部分版本兼容问题</li>
-            <li><b>Version 4.4.1</b> 删除冗余依赖</li>
-            <li><b>Version 4.0.3</b> 新增DDL规则,去掉log4j</li>
             <li><b>Version 4.0.0</b> 优化SQL扫描算法,以及完全国际化</li>
-            <li><b>Version 3.2.5</b> 修复部分插件显示问题</li>
-            <li><b>Version 3.2.2</b> 忽略包含'.idea'和'target'名字的目录</li>
             <li><b>Version 3.2.1</b> 新增规则开关和调整规则等级</li>
             <li><b>Version 2.1.0</b> 支持数据库 MySQL,Oracle,Gauss,PostgreSQL,DB2等</li>
         </ul>
